@@ -2,9 +2,16 @@
 var express = require('express');
 var app = express();
 // TODO: read .json config instead of requiring js
-var config = require('./config.js');
+var config = require('./config');
+var ConextReader = require('./app/conext-rl-module');
 
-app.get('/', function(req, res) {
+
+app.get('/state', function(req, res) {
+	var inverter = new ConextReader(2);
+	inverter.read()
+		.then((data) => {
+			res.send(data);
+		});
 
 });
 
