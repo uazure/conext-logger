@@ -1,8 +1,8 @@
 TODO:
 
 MVP:
-- crontab to run periodically to gather data
-- store data in postgresql
++ crontab to run periodically to gather data
++ store data in postgresql
 - mobile dashboard with today info
 + live current measurements
 - total -> inverter -> dc hierarchy
@@ -10,3 +10,4 @@ MVP:
 
 MVP2:
 - process stored data and provide cumulative stats
+- fancy plots
