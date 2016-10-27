@@ -5,7 +5,6 @@ var app = express();
 var config = require('./config');
 var ConextReader = require('./app/conext-rl-module');
 
-
 app.get('/state', function(req, res) {
 	var inverter = new ConextReader(2);
 	inverter.read()
@@ -20,4 +19,6 @@ app.use(express.static('public'));
 
 app.listen(config.port, function() {
 	console.log('Running on port', config.port);
+	console.log('Launching scheduler');
+	require('./schedule')();
 });

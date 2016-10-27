@@ -41,15 +41,19 @@ class ConextReader {
 
 	read() {
 		var promise = new Promise((resolve, reject) => {
-			// correct context
-			this._connect()
-				.then(() => this._initialize)
-				.then(this._read.bind(this))
-				.then(() => {
-					resolve(this._state);
-				});
-
+			try {
+				// correct context
+				this._connect()
+					.then(() => this._initialize)
+					.then(this._read.bind(this))
+					.then(() => {
+						resolve(this._state);
+					});
+			} catch (er) {
+				reject();
+			}
 		});
+
 		return promise;
 	}
 
@@ -88,7 +92,7 @@ class ConextReader {
 			let client = new ModbusRTU();
 			client.setID(this._id);
 			this._client = client;
-			client.connectRTU(modbusConfig.serial, {baudrate: modbusConfig.baudRate}, this._setOnline.bind(this, resolve));
+			client.connectRTU(modbusConfig.serial, {baudrate: modbusConfig.baudRate}, this._setOnline.bind(this, resolve), () => {throw new Error('Can not connect')});
 		});
 		return promise;
 	}

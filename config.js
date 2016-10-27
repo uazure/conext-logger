@@ -1,5 +1,10 @@
+var Sequelize = require('sequelize');
+
 module.exports = {
 	port: 8000,
+	db: {
+		connectionString: 'postgres://solar:solar@localhost:5432/solar'
+	},
 	inverters: [
 		{
 			id: 2,
