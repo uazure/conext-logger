@@ -14,6 +14,11 @@
 						});
 				}
 
+				vm.showDetails = false;
+				vm.toggleShowDetails = () => {
+					vm.showDetails = !vm.showDetails;
+				}
+
 				let callUpdate = () => {
 					vm.update().then(() => {
 						$timeout(() => {callUpdate()}, 1000);

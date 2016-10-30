@@ -47,9 +47,11 @@ class ConextReader {
 					.then(() => this._initialize)
 					.then(this._read.bind(this))
 					.then(() => {
+						debugger;
 						resolve(this._state);
 					});
 			} catch (er) {
+				debugger;
 				reject();
 			}
 		});

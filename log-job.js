@@ -2,43 +2,7 @@ var uuid = require('node-uuid');
 var config = require('./config');
 var ConextReader = require('./app/conext-rl-module');
 // ConextReader = require('./app/mock/conext-rl-module');
-var Sequelize = require('sequelize');
-var sequelize = new Sequelize(config.db.connectionString);
-
-
-debugger;
-var Model = sequelize.define('measurement', {
-	id: {type: Sequelize.UUID, primaryKey: true},
-	inverter_id: {type: Sequelize.INTEGER, notNull: true},
-	dc1_voltage: {type: Sequelize.DECIMAL(5,2)},
-	dc1_current: {type: Sequelize.DECIMAL(4,2)},
-	dc1_power: {type: Sequelize.DECIMAL(5,3)},
-	dc1_energy: {type: Sequelize.DECIMAL(6,3)},
-	dc2_voltage: {type: Sequelize.DECIMAL(5,2)},
-	dc2_current: {type: Sequelize.DECIMAL(4,2)},
-	dc2_power: {type: Sequelize.DECIMAL(5,3)},
-	dc2_energy: {type: Sequelize.DECIMAL(6,3)},
-	ac_voltage: {type: Sequelize.DECIMAL(5,2)},
-	ac_current: {type: Sequelize.DECIMAL(4,2)},
-	ac_power: {type: Sequelize.DECIMAL(5,3)},
-	ac_energy: {type: Sequelize.DECIMAL(6,3)},
-	ac_freq: {type: Sequelize.DECIMAL(4,2)},
-	duration: {type: Sequelize.INTEGER},
-	total_energy: {type: Sequelize.DECIMAL(8,3)},
-	total_duration: {type: Sequelize.BIGINT}
-}, {
-	createdAt: 'created_at',
-	updatedAt: false,
-	indexes: [
-		{
-			fields: ['inverter_id']
-		},
-		{
-			fields: ['created_at']
-		}
-	]
-});
-
+var measurement = require('./app/measurement-model');
 
 var ConextModelConverter = function(conextModel) {
 	var model = {};
@@ -73,27 +37,13 @@ module.exports = function() {
 		.then((data) => {
 			debugger;
 			console.log('got data', data);
-
-			sequelize.authenticate()
-				.then(function(err) {
-					console.log('Connection has been established successfully.');
-
-					debugger;
-
-					// Model.sync({force: true}).then(function () {
-	// Table created
-					Model.create(ConextModelConverter(data))
-						.then(() => {
-							console.log('logged ok');
-						});
-					// }).then(Model.sync);
-
-				})
-				.catch(function (err) {
-					console.log('Unable to connect to the database:', err);
+			measurement.create(ConextModelConverter(data))
+				.then(() => {
+					console.log('logged ok');
 				});
 		})
-		.catch(() => {
+		.catch((err) => {
+			debugger;
 			console.warn('Failed to read data');
 		});
 }
