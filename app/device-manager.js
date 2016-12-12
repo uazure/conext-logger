@@ -13,8 +13,25 @@ config.inverters.forEach((inv) => {
 	inverters.push(instance);
 })
 
+let pendingReply;
+
 let manager = {
-	readAll: () => {
+	readAll: function() {
+		if (pendingReply) {
+			return pendingReply;
+		}
+
+		pendingReply = this._readAll();
+		pendingReply.then((res) => {
+			pendingReply = null;
+			return res;
+		}, (res) => {
+			pendingReply = null;
+		});
+
+		return pendingReply;
+	},
+	_readAll: function() {
 		debugger;
 		let reply = [];
 		let promise = new Promise((resolve, reject) => {
