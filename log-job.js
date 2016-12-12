@@ -1,6 +1,7 @@
 var uuid = require('node-uuid');
 var config = require('./config');
-var ConextReader = require('./app/conext-rl-module');
+// var ConextReader = require('./app/conext-rl-module');
+var deviceManager = require('./app/device-manager');
 // ConextReader = require('./app/mock/conext-rl-module');
 var measurement = require('./app/measurement-model');
 
@@ -32,15 +33,18 @@ var ConextModelConverter = function(conextModel) {
 
 
 module.exports = function() {
-	var inverter = new ConextReader(2);
-	inverter.read()
+
+	deviceManager.readAll()
 		.then((data) => {
 			debugger;
 			console.log('got data', data);
-			measurement.create(ConextModelConverter(data))
-				.then(() => {
-					console.log('logged ok');
-				});
+			data.forEach((res) => {
+				measurement.create(ConextModelConverter(res))
+					.then(() => {
+						console.log('logged ok');
+					});
+			})
+
 		})
 		.catch((err) => {
 			debugger;

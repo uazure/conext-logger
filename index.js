@@ -3,16 +3,14 @@ var express = require('express');
 var app = express();
 // TODO: read .json config instead of requiring js
 var config = require('./config');
-var ConextReader = require('./app/conext-rl-module');
+// var ConextReader = require('./app/conext-rl-module');
+var deviceManager = require('./app/device-manager');
 var measurement = require('./app/measurement-model');
 
 app.get('/api/state', function(req, res) {
-	var inverter = new ConextReader(2);
-	inverter.read()
-		.then((data) => {
-			res.send(data);
-		});
-
+	deviceManager.readAll().then((data) => {
+		res.send(data);
+	});
 });
 
 app.get('/api/day/:date?', function(req, res) {

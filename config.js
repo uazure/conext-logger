@@ -6,6 +6,15 @@ module.exports = {
 		connectionString: 'postgres://solar:solar@localhost:5432/solar'
 	},
 	inverters: [
+		// {
+		// 	id: 1,
+		// 	module: 'conext-rl-module',
+		// 	name: 'Conext RL 3000E',
+		// 	inputs: [
+		// 		{name: 'dc1', panelVendor: 'Yabang Solar', panelPower: 250, panelQty: 6},
+		// 		{name: 'dc2', panelVendor: 'AbiSolar', panelPower: 250, panelQty: 6}
+		// 	]
+		// },
 		{
 			id: 2,
 			module: 'conext-rl-module',
