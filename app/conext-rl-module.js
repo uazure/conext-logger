@@ -94,7 +94,7 @@ class ConextReader {
 			let client = new ModbusRTU();
 			client.setID(this._id);
 			this._client = client;
-			client.connectRTU(modbusConfig.serial, {baudrate: modbusConfig.baudRate}, this._setOnline.bind(this, resolve), () => {throw new Error('Can not connect')});
+			client[modbusConfig.method](modbusConfig.serial, modbusConfig.options, this._setOnline.bind(this, resolve), () => {throw new Error('Can not connect')});
 		});
 		return promise;
 	}
