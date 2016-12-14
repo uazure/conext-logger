@@ -1,3 +1,5 @@
+'use strict';
+
 /** a module for Conext RL 4000 invertor.
 exports constructor function
 

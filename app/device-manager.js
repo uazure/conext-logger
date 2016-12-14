@@ -1,3 +1,5 @@
+'use strict';
+
 let ConextReader = require('./conext-rl-module');
 let config = require('../config.js');
 
