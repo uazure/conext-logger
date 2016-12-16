@@ -1,8 +1,12 @@
-var config = require('../config');
-var Sequelize = require('sequelize');
-var sequelize = new Sequelize(config.db.connectionString);
+let config = require('../config');
+let Sequelize = require('sequelize');
+let logger = require('./logger');
 
-var Measurement = sequelize.define('measurement', {
+let sequelize = new Sequelize(config.db.connectionString, {
+	logging: logger.log
+});
+
+let Measurement = sequelize.define('measurement', {
 	id: {type: Sequelize.UUID, primaryKey: true},
 	inverter_id: {type: Sequelize.INTEGER, notNull: true},
 	dc1_voltage: {type: Sequelize.DECIMAL(5,2)},

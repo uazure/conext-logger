@@ -4,7 +4,7 @@ function ConextReaderMock() {
 
 ConextReaderMock.prototype = {
 	read: function() {
-		var promise = new Promise(function(success, fail) {
+		let promise = new Promise(function(success, fail) {
 			success({ createdAt: new Date(),
 			inverterId: 2,
 			ac:

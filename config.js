@@ -1,5 +1,3 @@
-var Sequelize = require('sequelize');
-
 module.exports = {
 	port: 8000,
 	db: {
@@ -28,5 +26,6 @@ module.exports = {
 	dcMap: {
 		'dc1': 0,
 		'dc2': 1
-	}
+	},
+	verbosity: 2, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
 };

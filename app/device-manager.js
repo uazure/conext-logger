@@ -2,11 +2,11 @@
 
 let ConextReader = require('./conext-rl-module');
 let config = require('../config.js');
+let logger = require('./logger');
 
 
 let prevPromiseReply = null;
 let inverters = [];
-debugger;
 
 // instantiate objects related to data readers (inverters)
 config.inverters.forEach((inv) => {
@@ -50,7 +50,7 @@ let manager = {
 			};
 
 			let handleError = function(res) {
-				console.err('Error occured', res);
+				logger.error('Error occured', res);
 				reject(res);
 			}
 

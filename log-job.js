@@ -1,12 +1,15 @@
-var uuid = require('node-uuid');
-var config = require('./config');
-// var ConextReader = require('./app/conext-rl-module');
-var deviceManager = require('./app/device-manager');
+'use strict';
+let uuid = require('uuid');
+let config = require('./config');
+// let ConextReader = require('./app/conext-rl-module');
+let deviceManager = require('./app/device-manager');
 // ConextReader = require('./app/mock/conext-rl-module');
-var measurement = require('./app/measurement-model');
+let measurement = require('./app/measurement-model');
+let logger = require('./app/logger');
 
-var ConextModelConverter = function(conextModel) {
-	var model = {};
+
+let ConextModelConverter = function(conextModel) {
+	let model = {};
 	model.id = uuid.v4();
 	model.inverter_id = conextModel.inverterId;
 	model.dc1_voltage = conextModel.dc[0].voltage;
@@ -36,19 +39,17 @@ module.exports = function() {
 
 	deviceManager.readAll()
 		.then((data) => {
-			debugger;
-			console.log('got data', data);
+			logger.log('got data', data);
 			data.forEach((res) => {
 				measurement.create(ConextModelConverter(res))
 					.then(() => {
-						console.log('logged ok');
+						logger.log('logged ok');
 					});
 			})
 
 		})
 		.catch((err) => {
-			debugger;
-			console.warn('Failed to read data');
+			logger.warn('Failed to read data from inverter');
 		});
 }
 

@@ -4,10 +4,11 @@
 exports constructor function
 
 */
-var config = require('./../config');
-var DataModel = require('./inverter-data-model');
+let config = require('./../config');
+let DataModel = require('./inverter-data-model');
+let logger = require('./logger');
 
-var modbusMap = {
+let modbusMap = {
 	initialize: {address: 0x0321, registers: 0},
 	acActual: {address: 0x041f, registers: 5},
 	acDay: {address: 0xcfff, registers: 4},
@@ -29,7 +30,7 @@ class ConextReader {
 		});
 
 		if (!this._config) {
-			console.error('Check config file for correct inverter configuratiion');
+			logger.error('Check config file for correct inverter configuratiion');
 			throw new Error('Failed to get configuration for inverter id', id);
 		}
 
@@ -42,7 +43,7 @@ class ConextReader {
 	}
 
 	read() {
-		var promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve, reject) => {
 			try {
 				// correct context
 				this._connect()
@@ -63,7 +64,7 @@ class ConextReader {
 
 	_read() {
 		// correct context
-		var promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve, reject) => {
 			//correct context
 
 			this._readValues('ac')
@@ -90,7 +91,7 @@ class ConextReader {
 	}
 
 	_connect() {
-		var promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve, reject) => {
 			let ModbusRTU = require("modbus-serial");
 			let modbusConfig = require('./modbus-config.js');
 			let client = new ModbusRTU();
@@ -111,7 +112,7 @@ class ConextReader {
 	}
 
 	_initialize() {
-		var promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve, reject) => {
 			this._client.writeRegister(modbusMap.initialize.address, modbusMap.initialize.registers)
 				.then(resolve);
 		});
@@ -119,10 +120,10 @@ class ConextReader {
 	}
 
 	_readValues(input) {
-		var promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve, reject) => {
 			this._switchInput(input)
 				.then(() => {
-					console.log('Read input', input);
+					logger.debug('Read input', input);
 					let queue = [];
 					switch (input) {
 						case 'dc1':
@@ -142,7 +143,7 @@ class ConextReader {
 	}
 
 	_readInputSequence(queue, resolve) {
-		var readExecutor;
+		let readExecutor;
 
 		if (queue.length > 0) {
 			readExecutor = queue[0];
@@ -160,9 +161,9 @@ class ConextReader {
 	}
 
 	_switchInput(input) {
-		var promise = new Promise((resolve, reject) => {
-			console.log('Switch input to', input);
-			var registerValue = -1;
+		let promise = new Promise((resolve, reject) => {
+			logger.debug('Switch input to', input);
+			let registerValue = -1;
 			switch (input) {
 				case 'dc1':
 				registerValue = 0x0030;
@@ -186,7 +187,7 @@ class ConextReader {
 	}
 
 	_readAcActual() {
-		var item = modbusMap.acActual;
+		let item = modbusMap.acActual;
 		return this._client.readInputRegisters(item.address, item.registers)
 			.then((data) => {
 				let buf = data.buffer;
@@ -202,31 +203,31 @@ class ConextReader {
 	}
 
 	_readAcDay() {
-		var item = modbusMap.acDay;
+		let item = modbusMap.acDay;
 		return this._client.readInputRegisters(item.address, item.registers)
 			.then((data) => {
-				var buf = data.buffer;
-				console.log('ac day', buf.toString('hex'));
-				var energy = buf.readUInt16BE(0); // Wh
-				var energyMult = buf.readUInt16BE(2); // mult
-				var duration = buf.readUInt16BE(4); // seconds
-				//var somethingElse = buf.readUInt16BE(6); // time mult?
+				let buf = data.buffer;
+				logger.debug('ac day', buf.toString('hex'));
+				let energy = buf.readUInt16BE(0); // Wh
+				let energyMult = buf.readUInt16BE(2); // mult
+				let duration = buf.readUInt16BE(4); // seconds
+				//let somethingElse = buf.readUInt16BE(6); // time mult?
 				this._state.ac.energy = (energy + (energyMult * 0xffff)) / 1000;
 				this._state.ac.duration = duration;
 			});
 	}
 
 	_readDcActual(input) {
-		var inputIndex = config.dcMap[input];
-		var state = this._state.dc[inputIndex];
-		var item = modbusMap.dcActual;
+		let inputIndex = config.dcMap[input];
+		let state = this._state.dc[inputIndex];
+		let item = modbusMap.dcActual;
 		return this._client.readInputRegisters(item.address, item.registers)
 			.then((data) => {
-				var buf = data.buffer;
-				console.log('dc actual value', buf.toString('hex'));
-				var voltage = buf.readUInt16BE(2) / 10;
-				var current = buf.readUInt16BE(4) / 100;
-				var power = buf.readUInt16BE(6) / 1000;
+				let buf = data.buffer;
+				logger.debug('dc actual value', buf.toString('hex'));
+				let voltage = buf.readUInt16BE(2) / 10;
+				let current = buf.readUInt16BE(4) / 100;
+				let power = buf.readUInt16BE(6) / 1000;
 
 				state.voltage = voltage;
 				state.current = current;
@@ -235,16 +236,16 @@ class ConextReader {
 	}
 
 	_readAcTotal() {
-		var item = modbusMap.acTotal;
+		let item = modbusMap.acTotal;
 		return this._client.readInputRegisters(item.address, item.registers)
 			.then((data) => {
-				var state = this._state.ac;
-				var buf = data.buffer;
-				console.log('ac total', buf.toString('hex'));
-				var energy = buf.readUInt16BE(0); // Wh
-				var energyMult = buf.readUInt16BE(2); // energy mult
-				var duration = buf.readUInt16BE(4); // seconds ???
-				var mult = buf.readUInt16BE(6); // mult
+				let state = this._state.ac;
+				let buf = data.buffer;
+				logger.debug('ac total', buf.toString('hex'));
+				let energy = buf.readUInt16BE(0); // Wh
+				let energyMult = buf.readUInt16BE(2); // energy mult
+				let duration = buf.readUInt16BE(4); // seconds ???
+				let mult = buf.readUInt16BE(6); // mult
 
 				state.totalEnergy = (energy + (energyMult * 0xffff)) / 1000;
 				state.totalDuration = duration + (0xffff * mult);
@@ -252,23 +253,24 @@ class ConextReader {
 	}
 
 	_readAcStatus() {
-		var item = modbusMap.acStatus;
+		let item = modbusMap.acStatus;
 		return this._client.readInputRegisters(item.address, item.registers)
 			.then((data) => {
-				var buf = data.buffer;
-				var state = this._state.ac;
+				let buf = data.buffer;
+				let state = this._state.ac;
 
-				console.log('ac status', buf.toString('hex'));
-				var code = buf.readUInt16BE(0);
+				logger.debug('ac status', buf.toString('hex'));
+				let code = buf.readUInt16BE(0);
 				switch (code) {
 					case 0:
 						state.online = 0;
 						break;
 					case 0x27:
+					case 0x23:
 						state.online = 1;
 						break;
 					default:
-						console.error('Unknown status', code);
+						logger.error('Unknown status', code);
 						state.online = 3;
 				}
 			});
@@ -277,9 +279,7 @@ class ConextReader {
 }
 
 
-
-
-var state = {
+let state = {
 	status: 'unknown',
 	dc1Power: 0, // kW
 	dc1Voltage: 0, //V
@@ -300,7 +300,7 @@ var state = {
 	acTotalEnergy: 0, // kWh
 	acTotalDuration: 0, //seconds?
 };
-var measurements = [];
+let measurements = [];
 
 // open connection to a serial port
 
@@ -319,7 +319,7 @@ function run() {
 						})
 				})
 		}, function() {
-			console.log('Failed to init');
+			logger.error('Failed to init');
 			finish();
 		})
 
@@ -327,60 +327,60 @@ function run() {
 }
 
 // function readDcDay() {
-// 	var item = modbusMap.dcDay;
+// 	let item = modbusMap.dcDay;
 // 	return client.readInputRegisters(item.address, item.registers)
 // 		.then(function(data) {
-// 			var buf = data.buffer;
-// 			console.log('dc day value', buf.toString('hex'));
+// 			let buf = data.buffer;
+// 			logger.log('dc day value', buf.toString('hex'));
 // 		});
 // }
 //
 // function readDcTotal() {
-// 	var item = modbusMap.acTotal;
+// 	let item = modbusMap.acTotal;
 // 	return client.readInputRegisters(item.address, item.registers)
 // 		.then(function(data) {
-// 			var buf = data.buffer;
-// 			console.log('dc total value', buf.toString('hex'));
+// 			let buf = data.buffer;
+// 			logger.log('dc total value', buf.toString('hex'));
 // 		});
 // }
 
 
 function readAcUnknown() {
-	var item = modbusMap.acUnknown;
+	let item = modbusMap.acUnknown;
 	return client.readInputRegisters(item.address, item.registers)
 		.then(function(data) {
-			var buf = data.buffer;
-			console.log('ac unknown', buf.toString('hex'));
+			let buf = data.buffer;
+			logger.log('ac unknown', buf.toString('hex'));
 		});
 }
 
 
 function initialize() {
-	console.log('initialize');
+	logger.log('initialize');
 	return client.writeRegister(0x0321, 0)
 }
 
 
 
 function response(address, data) {
-	console.log(address.toString(16) + '\t' + data.buffer.toString('hex'));
+	logger.log(address.toString(16) + '\t' + data.buffer.toString('hex'));
 	return data;
 }
 
 function errorHandler(err) {
-	console.error('Error', err);
+	logger.error('Error', err);
 	return err;
 }
 
 
 function crc16(buffer) {
-	var crc = 0xFFFF;
-	var odd;
+	let crc = 0xFFFF;
+	let odd;
 
-	for (var i = 0; i < buffer.length; i++) {
+	for (let i = 0; i < buffer.length; i++) {
 		crc = crc ^ buffer[i];
 
-		for (var j = 0; j < 8; j++) {
+		for (let j = 0; j < 8; j++) {
 			odd = crc & 0x0001;
 			crc = crc >> 1;
 			if (odd) {
@@ -393,7 +393,7 @@ function crc16(buffer) {
 };
 
 function sec2str(t){
-	var d = Math.floor(t/86400),
+	let d = Math.floor(t/86400),
 	h = ('0'+Math.floor(t/3600) % 24).slice(-2),
 	m = ('0'+Math.floor(t/60)%60).slice(-2),
 	s = ('0' + t % 60).slice(-2);
@@ -401,9 +401,9 @@ function sec2str(t){
 }
 
 function finish() {
-	//console.log('Recorded state', state);
+	//logger.log('Recorded state', state);
 	state.acDayDurationText = sec2str(state.acDayDuration);
-	console.log('state', state);
+	logger.log('state', state);
 	process.exit(0);
 }
 
