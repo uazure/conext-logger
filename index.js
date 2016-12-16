@@ -49,7 +49,7 @@ app.get('/api/alltime', function(req, res) {
 });
 
 // serve static files from 'public' dir
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 app.listen(config.port, function() {
 	console.log('Running on port', config.port);
