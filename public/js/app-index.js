@@ -11,6 +11,7 @@
 					return currentMeasurementRepository.get()
 						.then((result) => {
 							vm.currentMeasurement = result.data;
+							vm.date = new Date();
 						});
 				}
 
