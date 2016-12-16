@@ -3,7 +3,7 @@
 	angular.module('app').component('appIndex',
 		{
 			templateUrl: 'partials/app-index.html',
-			controller: ['$scope', '$timeout', 'currentMeasurementRepository', function($scope, $timeout, currentMeasurementRepository) {
+			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository) {
 				var vm = $scope;
 				vm.date = new Date();
 				vm.currentMeasurement = {};
@@ -27,6 +27,9 @@
 				};
 
 				callUpdate();
+				dayMeasurementRepository.get().then((data) => {
+					vm.dayData = data;
+				})
 
 			}]
 		});
