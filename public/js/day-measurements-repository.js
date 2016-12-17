@@ -1,6 +1,6 @@
 (function(angular) {
 	'use strict';
-	angular.module('app').factory('dayMeasurementRepository', ['$http', '$filter', 'dayMeasurementAdapter', function($http, $filter, dayMeasurementAdapter) {
+	angular.module('app').factory('dayMeasurementRepository', ['$http', '$filter', function($http, $filter) {
 		return {
 			get: function(date) {
 				if (!date) {
@@ -11,7 +11,7 @@
 
 				return $http.get('/api/day/' + dateString)
 					.then(function(data) {
-						return dayMeasurementAdapter.convertAll(data.data);
+						return data.data;
 					});
 			}
 		}
