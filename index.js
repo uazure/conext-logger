@@ -14,9 +14,10 @@ app.get('/api/state', function(req, res) {
 });
 
 app.get('/api/day/:date?', function(req, res) {
-	var targetDateEnd;
-	var targetDateStart;
+	let targetDateEnd;
+	let targetDateStart;
 	let requestDate = req.params.date;
+
 	if (!requestDate) {
 		targetDateEnd = new Date();
 		let year = targetDateEnd.getFullYear();
