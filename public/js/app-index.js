@@ -9,27 +9,24 @@
 				vm.currentMeasurement = {};
 				vm.update = function() {
 					return currentMeasurementRepository.get()
-						.then((result) => {
+						.then(function(result) {
 							vm.currentMeasurement = result.data;
 							vm.date = new Date();
 						});
 				}
 
 				vm.showDetails = false;
-				vm.toggleShowDetails = () => {
+				vm.toggleShowDetails = function() {
 					vm.showDetails = !vm.showDetails;
 				}
 
-				let callUpdate = () => {
-					vm.update().then(() => {
-						$timeout(() => {callUpdate()}, 1000);
+				function callUpdate() {
+					vm.update().then(function() {
+						$timeout(function() {callUpdate()}, 1000);
 					})
 				};
 
 				callUpdate();
-				dayMeasurementRepository.get().then((data) => {
-					vm.dayData = data;
-				})
 
 			}]
 		});

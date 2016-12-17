@@ -27,5 +27,5 @@ module.exports = {
 		'dc1': 0,
 		'dc2': 1
 	},
-	verbosity: 2, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
+	verbosity: 3, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
 };
