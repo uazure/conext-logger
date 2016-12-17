@@ -3,11 +3,24 @@ TODO:
 MVP:
 + crontab to run periodically to gather data
 + store data in postgresql
-- mobile dashboard with today info
++ mobile dashboard with today info
 + live current measurements
-- total -> inverter -> dc hierarchy
-+- pluggable & configurable modules for inverters
++ total -> inverter -> dc hierarchy
++ pluggable & configurable modules for inverters
 
 MVP2:
-- process stored data and provide cumulative stats
-- fancy plots
++ fancy plots
+
+- job to cleanup stored data to remove uninformative data storage by schedule
+- job to process data to sum up daily stats by schedule
+
+- api to provide daily summary data
+- api to provide monthly summary data
+- api to provide inverter/dc inputs information
+
+- view with historical data (1 day)
+- view with 2 days comparison (datepicker involved)
+- view with monthly stats
+- view with inverter details
+
+- fix concurrency problem with ConextReader
