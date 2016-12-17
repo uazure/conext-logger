@@ -2,45 +2,47 @@
 	'use strict';
 	angular.module('app').factory('dayMeasurementAdapter', [function() {
 		return {
-			convertAll: function(dataArray) {
-				var data = [];
+			convertKeys: function(inverters, keys) {
+				var rows = []; // rows object for nvd3 plot
 
-				function getKeyObject(record) {
-					var result;
-
-					data.some(function(item) {
-						if (item.inverterId == record.inverter_id) {
-							result = item;
-							return true;
+				function getRowObject(inverterId, field) {
+					var resultRow;
+					rows.some(function(row) {
+						if (row.inverterId === inverterId && row.field === field) {
+							resultRow = row;
 						}
-
-						return false;
 					});
 
-					if (!result) {
-						result = {
-							key: "Inverter " + record.inverter_id,
-							inverterId: record.inverter_id,
+					if (!resultRow) {
+						resultRow = {
+							inverterId: inverterId,
+							field: field,
+							key: 'Inverter ' + inverterId + ', ' + field,
 							values: []
-						};
-						data.push(result);
+						}
+						rows.push(resultRow);
 					}
 
-					return result;
-				};
+					return resultRow;
+				}
 
 
-				dataArray.forEach(function(item) {
-					var key = getKeyObject(item);
-					key.values.push({
-						createdAt: item.created_at,
-						power: item.ac_power,
-						dc1Power: item.dc1_power,
-						dc2Power: item.dc2_power
+				inverters.forEach(function(inverter) {
+
+					inverter.values.forEach(function(value) {
+						for (var key in value) {
+							if (key === 'createdAt' || keys.indexOf(key) < 0) {
+								continue;
+							}
+
+							var row = getRowObject(inverter.inverterId, key);
+							row.values.push([new Date(value.createdAt), value[key]]);
+						}
+
 					})
-				});
+				})
 
-				return data;
+				return rows;
 			}
 		}
 	}]

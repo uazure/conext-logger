@@ -2,8 +2,10 @@
 	'use strict';
 	angular.module('app').component('dayData', {
 		templateUrl: 'partials/day-data.html',
-		controller: ['$scope', '$timeout', 'dayMeasurementRepository', function($scope, $timeout, dayMeasurementRepository) {
+		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', function($scope, dayMeasurementRepository, dayMeasurementAdapter) {
 			var vm = $scope;
+
+			vm.config = {refreshDataOnly: false};
 
 			vm.options = {
 				chart: {
@@ -28,7 +30,7 @@
 					xAxis: {
 						showMaxMin: false,
 						tickFormat: function(d) {
-							return d3.time.format('%x')(new Date(d))
+							return d3.time.format('%X')(new Date(d))
 						}
 					},
 					yAxis: {
@@ -50,9 +52,11 @@
 
 			vm.data = [];
 
-			dayMeasurementRepository.get().then(function(data) {
-				vm.data = data;
-			});
+			dayMeasurementRepository.get()
+				.then(function(data) {
+					vm.data = dayMeasurementAdapter.convertKeys(data, ['dc1Power', 'dc2Power']);
+				});
+
 		}]
 	});
 }(angular));

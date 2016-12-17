@@ -19,6 +19,7 @@
     "angular": "^1.5.8",
     "angular-nvd3": "^1.0.9",
     "bootstrap": "^3.3.7",
+    "cors": "^2.8.1",
     "d3": "^3.5.17",
     "express": "^4.14.0",
     "modbus-serial": "^4.5.1",

@@ -1,11 +1,16 @@
 'use strict';
 var express = require('express');
 var app = express();
+var cors = require('cors');
 // TODO: read .json config instead of requiring js
 var config = require('./config');
 // var ConextReader = require('./app/conext-rl-module');
 var deviceManager = require('./app/device-manager');
 var measurement = require('./app/measurement-model');
+var measurementArrayConverter = require('./app/measurement-model-array-converter');
+
+app.use(cors());
+app.options('*', cors());
 
 app.get('/api/state', function(req, res) {
 	deviceManager.readAll().then((data) => {
@@ -39,9 +44,14 @@ app.get('/api/day/:date?', function(req, res) {
 				$lt: targetDateEnd,
 				$gt: targetDateStart
 			}
-		}
+		},
+		order: [
+			['created_at', 'ASC']
+		]
 	})
-		.then((data) => {res.send(data)});
+		.then((data) => {
+
+			res.send(measurementArrayConverter(data))});
 });
 
 app.get('/api/alltime', function(req, res) {
