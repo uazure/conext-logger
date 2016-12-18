@@ -55,6 +55,11 @@
 			dayMeasurementRepository.get()
 				.then(function(data) {
 					vm.data = dayMeasurementAdapter.convertKeys(data, ['dc1Power', 'dc2Power']);
+					var maxValues = data.map(function(series) {
+						return d3.max(series.values, function(value) {return value[1];});
+					})
+					var max = d3.sum(maxValues, function(x) {return x;});
+					vm.options.chart.yDomain = [0, Math.max(1, max)]
 				});
 
 		}]
