@@ -21,8 +21,10 @@ let modbusMap = {
 };
 
 class ConextReader {
-	constructor(id) {
+	constructor(id, modbusClient) {
 		this._id = id;
+		this._client = modbusClient;
+
 		config.inverters.forEach((inverter) => {
 			if (inverter.id === id) {
 				this._config = inverter;
@@ -46,19 +48,26 @@ class ConextReader {
 		let promise = new Promise((resolve, reject) => {
 			try {
 				// correct context
-				this._connect()
-					.then(() => this._initialize)
+				this._initialize()
 					.then(this._read.bind(this))
 					.then(() => {
-						debugger;
 						resolve(this._state);
 					});
 			} catch (er) {
-				debugger;
+				logger.error('Got error', er);
 				reject();
 			}
 		});
 
+		return promise;
+	}
+
+	_initialize() {
+		this._client.setID(this._id);
+		let promise = new Promise((resolve, reject) => {
+			this._client.writeRegister(modbusMap.initialize.address, modbusMap.initialize.registers)
+				.then(resolve);
+		});
 		return promise;
 	}
 
@@ -74,33 +83,20 @@ class ConextReader {
 					if (this._config.inputs.length > 1) {
 						return this._readValues('dc2');
 					} else {
-						return new Promise((resolve) => {
-							resolve();
-						});
+						// return new Promise((resolve) => {
+						// 	resolve();
+						// });
 					}
 				})
 				.then(() => {
-					this._client.close();
-					delete this._client;
 					resolve();
-
 				});
 		});
 
 		return promise;
 	}
 
-	_connect() {
-		let promise = new Promise((resolve, reject) => {
-			let ModbusRTU = require("modbus-serial");
-			let modbusConfig = require('./modbus-config.js');
-			let client = new ModbusRTU();
-			client.setID(this._id);
-			this._client = client;
-			client[modbusConfig.method](modbusConfig.serial, modbusConfig.options, this._setOnline.bind(this, resolve), () => {throw new Error('Can not connect')});
-		});
-		return promise;
-	}
+
 
 	_setOnline(resolve) {
 		this._isOnline = true;
@@ -109,14 +105,6 @@ class ConextReader {
 
 	_setOffline() {
 		this._isOnline = false;
-	}
-
-	_initialize() {
-		let promise = new Promise((resolve, reject) => {
-			this._client.writeRegister(modbusMap.initialize.address, modbusMap.initialize.registers)
-				.then(resolve);
-		});
-		return promise;
 	}
 
 	_readValues(input) {
@@ -244,7 +232,7 @@ class ConextReader {
 				logger.debug('ac total', buf.toString('hex'));
 				let energy = buf.readUInt16BE(0); // Wh
 				let energyMult = buf.readUInt16BE(2); // energy mult
-				let duration = buf.readUInt16BE(4); // seconds ???
+				let duration = buf.readUInt16BE(4); // seconds
 				let mult = buf.readUInt16BE(6); // mult
 
 				state.totalEnergy = (energy + (energyMult * 0xffff)) / 1000;
@@ -271,7 +259,7 @@ class ConextReader {
 						break;
 					default:
 						logger.error('Unknown status', code);
-						state.online = 3;
+						state.online = 0;
 				}
 			});
 	}
@@ -302,49 +290,6 @@ let state = {
 };
 let measurements = [];
 
-// open connection to a serial port
-
-
-function run() {
-	client.setID(2);
-
-	initialize()
-		.then(function() {
-			readValues('dc1')
-				.then(function() {
-					readValues('dc2')
-						.then(function() {
-							readValues('ac')
-								.then(finish);
-						})
-				})
-		}, function() {
-			logger.error('Failed to init');
-			finish();
-		})
-
-
-}
-
-// function readDcDay() {
-// 	let item = modbusMap.dcDay;
-// 	return client.readInputRegisters(item.address, item.registers)
-// 		.then(function(data) {
-// 			let buf = data.buffer;
-// 			logger.log('dc day value', buf.toString('hex'));
-// 		});
-// }
-//
-// function readDcTotal() {
-// 	let item = modbusMap.acTotal;
-// 	return client.readInputRegisters(item.address, item.registers)
-// 		.then(function(data) {
-// 			let buf = data.buffer;
-// 			logger.log('dc total value', buf.toString('hex'));
-// 		});
-// }
-
-
 function readAcUnknown() {
 	let item = modbusMap.acUnknown;
 	return client.readInputRegisters(item.address, item.registers)
@@ -356,22 +301,9 @@ function readAcUnknown() {
 
 
 function initialize() {
-	logger.log('initialize');
+	logger.debug('initialize reader');
 	return client.writeRegister(0x0321, 0)
 }
-
-
-
-function response(address, data) {
-	logger.log(address.toString(16) + '\t' + data.buffer.toString('hex'));
-	return data;
-}
-
-function errorHandler(err) {
-	logger.error('Error', err);
-	return err;
-}
-
 
 function crc16(buffer) {
 	let crc = 0xFFFF;
@@ -398,13 +330,6 @@ function sec2str(t){
 	m = ('0'+Math.floor(t/60)%60).slice(-2),
 	s = ('0' + t % 60).slice(-2);
 	return (d>0?d+'d ':'')+(h>0?h+':':'')+(m>0?m+':':'')+(t>60?s:s+'s');
-}
-
-function finish() {
-	//logger.log('Recorded state', state);
-	state.acDayDurationText = sec2str(state.acDayDuration);
-	logger.log('state', state);
-	process.exit(0);
 }
 
 
