@@ -10,12 +10,18 @@
 			vm.options = {
 				chart: {
 					type: 'stackedAreaChart',
+					title: 'Today power production',
+					controlLabels: {
+						"stacked":"All",
+						"expanded":"Relative yield",
+					},
+					controlOptions: ["Stacked","Expanded"],
 					height: 450,
 					margin: {
-						top: 20,
-						right: 20,
-						bottom: 30,
-						left: 40
+						top: 0,
+						right: 75,
+						bottom: 40,
+						left: 10
 					},
 					x: function(d) {
 						return d[0];
@@ -23,7 +29,7 @@
 					y: function(d) {
 						return d[1];
 					},
-					useVoronoi: false,
+					useVoronoi: true,
 					clipEdge: true,
 					duration: 100,
 					useInteractiveGuideline: true,
@@ -31,13 +37,16 @@
 						showMaxMin: false,
 						tickFormat: function(d) {
 							return d3.time.format('%X')(new Date(d))
-						}
+						},
+						axisLabel: 'Time'
 					},
 					yAxis: {
 						tickFormat: function(d) {
-							return d3.format(',.2f')(d);
-						}
+							return d3.format(',.1f')(d);
+						},
+						axisLabel: 'Power, kW'
 					},
+					rightAlignYAxis: true,
 					zoom: {
 						enabled: true,
 						scaleExtent: [1, 10],
@@ -49,6 +58,8 @@
 					}
 				}
 			};
+
+
 
 			vm.data = [];
 
