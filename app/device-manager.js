@@ -4,6 +4,7 @@ var modbusConfig = require('./modbus-config.js');
 var ConextReader = require('./conext-rl-module');
 var config = require('../config.js');
 var logger = require('./logger');
+var Promise = require('bluebird');
 
 
 var prevPromiseReply = null;
@@ -43,7 +44,7 @@ var manager = {
 
 		if (!isConnected) {
 			logger.log('Not connected to modbus yet, will read data once connected')
-			return connectedPromise.then(manager.readAll);
+			return connectedPromise.then(manager.readAll.bind(this));
 		}
 
 		pendingReply = this._readAll();

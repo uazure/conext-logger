@@ -7,6 +7,7 @@ exports constructor function
 let config = require('./../config');
 let DataModel = require('./inverter-data-model');
 let logger = require('./logger');
+var Promise = require('bluebird');
 
 let modbusMap = {
 	initialize: {address: 0x0321, registers: 0},
