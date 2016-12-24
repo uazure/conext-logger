@@ -5,7 +5,7 @@ let config = require('../config');
 module.exports = {
 	debug: function() {
 		if (config.verbosity >= 4) {
-			console.debug.apply(console, arguments);
+			console.log.apply(console, ['Debug'].concat(arguments));
 		}
 	},
 

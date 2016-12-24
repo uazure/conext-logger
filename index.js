@@ -15,7 +15,8 @@ app.options('*', cors());
 app.get('/api/state', function(req, res) {
 	deviceManager.readAll().then((data) => {
 		res.json(data);
-	});
+	})
+	.catch((err) => {res.json({error: true, details: err})})
 });
 
 app.get('/api/day/:date?', function(req, res) {
@@ -56,7 +57,8 @@ app.get('/api/day/:date?', function(req, res) {
 
 app.get('/api/alltime', function(req, res) {
 	measurement.findAll()
-		.then((data) => {res.json(data)});
+		.then((data) => {res.json(data)})
+		.catch((err) => {res.json({error: true, details: err})})
 });
 
 // serve static files from 'public' dir

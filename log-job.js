@@ -2,13 +2,13 @@
 let uuid = require('uuid');
 let config = require('./config');
 // let ConextReader = require('./app/conext-rl-module');
-let deviceManager = require('./app/device-manager');
+var deviceManager = require('./app/device-manager');
 // ConextReader = require('./app/mock/conext-rl-module');
-let measurement = require('./app/measurement-model');
-let logger = require('./app/logger');
+var measurement = require('./app/measurement-model');
+var logger = require('./app/logger');
 
 
-let ConextModelConverter = function(conextModel) {
+var ConextModelConverter = function(conextModel) {
 	let model = {};
 	model.id = uuid.v4();
 	model.inverter_id = conextModel.inverterId;
@@ -49,7 +49,7 @@ module.exports = function() {
 
 		})
 		.catch((err) => {
-			logger.warn('Failed to read data from inverter');
+			logger.warn('Failed to read data from inverter', err);
 		});
 }
 
