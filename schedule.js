@@ -3,5 +3,5 @@ var LogJob = require('./log-job');
 
 module.exports = function() {
 	//save values to db every 5 minutes
-	crontab.scheduleJob('*/5 * * * *', LogJob);
+	crontab.scheduleJob('* 6-21 * * *', LogJob);
 };
