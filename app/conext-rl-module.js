@@ -46,6 +46,7 @@ class ConextReader {
 	}
 
 	read() {
+		this._state.createdAt = new Date();
 		let promise = new Promise((resolve, reject) => {
 			try {
 				// correct context
@@ -289,7 +290,6 @@ let state = {
 	acTotalEnergy: 0, // kWh
 	acTotalDuration: 0, //seconds?
 };
-let measurements = [];
 
 function readAcUnknown() {
 	let item = modbusMap.acUnknown;
