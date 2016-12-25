@@ -13,6 +13,9 @@ app.use(cors());
 app.options('*', cors());
 
 app.get('/api/state', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
 	deviceManager.readAll().then((data) => {
 		res.json(data);
 	})
@@ -20,6 +23,9 @@ app.get('/api/state', function(req, res) {
 });
 
 app.get('/api/day/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
 	let targetDateEnd;
 	let targetDateStart;
 	let requestDate = req.params.date;
@@ -56,6 +62,9 @@ app.get('/api/day/:date?', function(req, res) {
 });
 
 app.get('/api/alltime', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
 	measurement.findAll()
 		.then((data) => {res.json(data)})
 		.catch((err) => {res.json({error: true, details: err})})
