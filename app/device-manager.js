@@ -13,17 +13,7 @@ var inverters = [];
 var isConnected = false;
 // instantiate modbusClient
 var client = new ModbusRTU();
-var connectedPromise = new Promise((resolve, reject) => {
-	client[modbusConfig.method](
-		modbusConfig.serial,
-		modbusConfig.options,
-		() => {
-			logger.log('Connect to modbus successful');
-			isConnected = true;
-			resolve();
-		},
-		() => {throw new Error('Can not connect to modbus');});
-});
+var connectedPromise;
 
 // instantiate objects related to data readers (inverters)
 config.inverters.forEach((inv) => {
@@ -33,10 +23,53 @@ config.inverters.forEach((inv) => {
 })
 
 var pendingReply;
+var failedReads = 0;
 
 
 
 var manager = {
+	connect: function() {
+		connectedPromise = new Promise((resolve, reject) => {
+			client[modbusConfig.method](
+				modbusConfig.serial,
+				modbusConfig.options,
+				() => {
+					logger.log('Connect to modbus successful');
+					isConnected = true;
+					resolve();
+				},
+				() => {
+					reject();
+				});
+		});
+	},
+
+	reconnect: function() {
+		isConnected = false;
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve('Reconnected in 1 sec');
+			}, 1000);
+		})
+
+	},
+
+	connectAndReadAll: function() {
+		this.connect();
+		return connectedPromise.catch((err) => {
+			logger.warn('Failed to connect to device', err);
+			return err;
+		})
+		.then(() => {
+			return this._readAllExecutor();
+		})
+
+	},
+
+	/* public method to reply on request. Handles parallel requests by sharing pendingReply
+		rejects on timeout (10 sec)
+		if not connected then will try to reconnect once;
+	*/
 	readAll: function() {
 		if (pendingReply) {
 			return pendingReply;
@@ -44,20 +77,57 @@ var manager = {
 
 		if (!isConnected) {
 			logger.log('Not connected to modbus yet, will read data once connected')
-			return connectedPromise.then(manager.readAll.bind(this));
+			return this.connectAndReadAll();
 		}
 
-		pendingReply = this._readAll();
+		pendingReply = this._readAllExecutor();
 		pendingReply.then((res) => {
+			failedReads = 0;
 			pendingReply = null;
 			return res;
-		}, (res) => {
-			logger.error('Device manager: failed to read data', res);
-			pendingReply = null;
 		});
 
 		return pendingReply;
 	},
+
+	/**
+	private method for executing readAll operation.
+	called
+	*/
+	_readAllExecutor: function() {
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				reject('Timed out');
+				pendingReply = null;
+				failedReads = 0;
+			}, 5000);
+
+			this._readAll().then(
+				(res) => {
+					resolve(res);
+				},
+				(res) => {
+					++failedReads;
+					logger.warn('Device manager:', res);
+					if (failedReads >= 3) {
+						logger.warn('Failed to read more than', failedReads, 'times');
+						pendingReply = null;
+						failedReads = 0;
+						reject('Failed to read');
+					} else {
+						logger.log('Trying to reconnect, attempt', failedReads);
+						this.reconnect().then(() => {
+							this.connectAndReadAll()
+								.then((res) => {
+									resolve(res)
+								});
+						});
+					}
+
+				});
+		});
+	},
+
 	_readAll: function() {
 		let reply = [];
 		let promise = new Promise((resolve, reject) => {
@@ -74,7 +144,6 @@ var manager = {
 			};
 
 			let handleError = function(res) {
-				logger.error('Error occured', res);
 				reject(res);
 			}
 

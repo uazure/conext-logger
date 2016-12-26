@@ -54,6 +54,9 @@ class ConextReader {
 					.then(this._read.bind(this))
 					.then(() => {
 						resolve(this._state);
+					})
+					.catch(() => {
+						reject('Failed to read data from inverter ' + this._id);
 					});
 			} catch (er) {
 				logger.error('Got error', er);
@@ -68,7 +71,11 @@ class ConextReader {
 		this._client.setID(this._id);
 		let promise = new Promise((resolve, reject) => {
 			this._client.writeRegister(modbusMap.initialize.address, modbusMap.initialize.registers)
-				.then(resolve);
+				.then(resolve)
+				.catch((err) => {
+					logger.warn('Failed to read reply', err);
+					reject("Failed to initialize");
+				});
 		});
 		return promise;
 	}
@@ -92,7 +99,8 @@ class ConextReader {
 				})
 				.then(() => {
 					resolve();
-				});
+				})
+				.catch(reject);
 		});
 
 		return promise;

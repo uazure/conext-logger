@@ -10,7 +10,7 @@
 				vm.update = function() {
 					return currentMeasurementRepository.get()
 						.then(function(result) {
-							vm.currentMeasurement = result.data;
+							vm.currentMeasurement = result;
 							vm.date = new Date();
 						});
 				}

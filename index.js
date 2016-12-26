@@ -17,9 +17,11 @@ app.get('/api/state', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 	deviceManager.readAll().then((data) => {
-		res.json(data);
+		res.json({success: true, payload: data});
 	})
-	.catch((err) => {res.json({error: true, details: err})})
+	.catch((err) => {
+		res.status(503).json({success: false, payload: err});
+	});
 });
 
 app.get('/api/day/:date?', function(req, res) {
