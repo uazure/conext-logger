@@ -22,7 +22,11 @@
 
 				function callUpdate() {
 					vm.update().then(function() {
-						$timeout(function() {callUpdate()}, 3000);
+						$timeout(function() {callUpdate();}, 3000);
+					})
+					.catch(function(err) {
+						console.warn('got error', err);
+						$timeout(function() {callUpdate();}, 5000);
 					})
 				};
 
