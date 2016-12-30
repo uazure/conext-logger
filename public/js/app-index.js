@@ -11,7 +11,7 @@
 					return currentMeasurementRepository.get()
 						.then(function(result) {
 							vm.currentMeasurement = result;
-							vm.date = new Date();
+							vm.date = new Date(result[0].createdAt);
 						});
 				}
 
