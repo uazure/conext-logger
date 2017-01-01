@@ -18,6 +18,8 @@
   "dependencies": {
     "angular": "^1.5.8",
     "angular-nvd3": "^1.0.9",
+    "angular-ui-bootstrap": "^2.4.0",
+    "angular-ui-router": "^0.3.2",
     "bluebird": "^3.4.7",
     "bootstrap": "^3.3.7",
     "cors": "^2.8.1",

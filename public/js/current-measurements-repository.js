@@ -1,9 +1,9 @@
 (function(angular) {
 	'use strict';
-	angular.module('app').factory('currentMeasurementRepository', ['$http', function($http) {
+	angular.module('app').factory('currentMeasurementRepository', ['$http', 'appConfig', function($http, appConfig) {
 		return {
 			get: function() {
-				return $http.get('/api/state').then(function(res) {
+				return $http.get(appConfig.backend + 'api/state').then(function(res) {
 					return res.data.payload;
 				});
 			}
