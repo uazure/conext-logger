@@ -68,7 +68,23 @@
 
 			dayMeasurementRepository.get()
 				.then(function(data) {
-					vm.data = dayMeasurementAdapter.convertKeys(data, ['dc1Power', 'dc2Power']);
+					var meaningfulData = angular.copy(data);
+
+					data.forEach(function(inverterData, index) {
+						var isLastMeaningful = false;
+						meaningfulData[index].values = inverterData.values.filter(
+							function(values) {
+								var isMeaningful = (values.power > 0);
+								var wasLastMeaningful = isLastMeaningful;
+								isLastMeaningful = isMeaningful;
+
+								if (isMeaningful || wasLastMeaningful) {
+									return true;
+								}
+							}
+						)
+					});
+					vm.data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
 					var maxValues = vm.data.map(function(series) {
 						return d3.max(series.values, function(value) {return value[1];});
 					})
