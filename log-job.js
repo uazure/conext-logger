@@ -6,6 +6,7 @@ var deviceManager = require('./app/device-manager');
 // ConextReader = require('./app/mock/conext-rl-module');
 var measurement = require('./app/measurement-model');
 var logger = require('./app/logger');
+var moment = require('moment');
 
 
 var ConextModelConverter = function(conextModel) {
@@ -34,18 +35,50 @@ var ConextModelConverter = function(conextModel) {
 	return model;
 };
 
+var lastMeasurementIsMeaningful = {};
+
+function isUpdateNeeded(date, data) {
+	let isLastMeaningful = isDataMeaningful[date];
+	let isCurrentDataMeaningful = isDataMeaningful(data);
+	let isRecordPresent = date in lastMeasurementIsMeaningful;
+	lastMeasurementIsMeaningful[date] = isCurrentDataMeaningful;
+
+	if (isCurrentDataMeaningful || !isRecordPresent || isLastMeaningful) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function isDataMeaningful(data) {
+	if (data.some((inverterData) => {
+		return inverterData.ac.power > 0 || inverterData.ac.online > 0
+	})) {
+		lastMeasurement[date] = data
+		return true;
+	}
+
+	return false;
+}
+
 
 module.exports = function() {
+	var date = moment().format('YYYY-MM-DD');
 
 	deviceManager.readAll()
 		.then((data) => {
 			logger.log('got data', data);
-			data.forEach((res) => {
-				measurement.create(ConextModelConverter(res))
-					.then(() => {
-						logger.log('logged ok');
-					});
-			})
+
+			if (isUpdateNeeded(date, data)) {
+				data.forEach((res) => {
+					measurement.create(ConextModelConverter(res))
+						.then(() => {
+							logger.log('logged ok');
+						});
+				});
+			} else {
+				logger.log('no logging needed');
+			}
 
 		})
 		.catch((err) => {
