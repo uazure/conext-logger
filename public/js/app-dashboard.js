@@ -7,18 +7,6 @@
 				var vm = $scope;
 				vm.date = new Date();
 				vm.currentMeasurement = {};
-				vm.startDateOpened = false;
-				vm.model = {
-					startDate: new Date()
-				};
-
-				vm.startDateOptions = {
-					dateDisabled: false,
-					formatYear: 'yy',
-					maxDate: new Date(),
-					minDate: new Date(2016, 0, 1),
-					startingDay: 1
-				};
 
 				vm.update = function() {
 					return currentMeasurementRepository.get()
@@ -29,12 +17,8 @@
 				}
 
 				vm.showDetails = false;
-				vm.toggleShowDetails = function() {
+				vm.toggleShowDetails = function(ev) {
 					vm.showDetails = !vm.showDetails;
-				}
-
-				vm.startDateToggle = function() {
-					vm.startDateOpened = !vm.startDateOpened;
 				}
 
 				function callUpdate() {

@@ -11,6 +11,14 @@
 			// component: 'appDashboard' // this doesn't work :(
 		});
 
+		$stateProvider.state({
+			name: 'dayHistory',
+			url: '/day/{date}',
+			template: '<app-day-history></app-day-history>'
+		});
+
+
+
 		$urlRouterProvider.otherwise('/');
 
 	}]);

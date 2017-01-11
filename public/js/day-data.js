@@ -2,8 +2,11 @@
 	'use strict';
 	angular.module('app').component('dayData', {
 		templateUrl: 'partials/day-data.html',
-		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', function($scope, dayMeasurementRepository, dayMeasurementAdapter) {
-			var vm = $scope;
+		bindings: {
+			'date': '<'
+		},
+		controller: ['dayMeasurementRepository', 'dayMeasurementAdapter', function(dayMeasurementRepository, dayMeasurementAdapter) {
+			var vm = this;
 
 			vm.config = {refreshDataOnly: false};
 
