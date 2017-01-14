@@ -23,4 +23,4 @@ MVP2:
 - view with monthly stats
 - view with inverter details
 
-- fix concurrency problem with ConextReader
++ fix concurrency problem with ConextReader
