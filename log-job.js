@@ -53,8 +53,8 @@ var ConextModelConverter = function(conextModel) {
 var lastMeasurementIsMeaningful = {};
 
 function isUpdateNeeded(date, data) {
-	let isLastMeaningful = isDataMeaningful[date];
-	let isCurrentDataMeaningful = isDataMeaningful(data);
+	let isLastMeaningful = lastMeasurementIsMeaningful[date];
+	let isCurrentDataMeaningful = isDataMeaningful(data, date);
 	let isRecordPresent = date in lastMeasurementIsMeaningful;
 	lastMeasurementIsMeaningful[date] = isCurrentDataMeaningful;
 
@@ -65,11 +65,11 @@ function isUpdateNeeded(date, data) {
 	}
 }
 
-function isDataMeaningful(data) {
+function isDataMeaningful(data, date) {
 	if (data.some((inverterData) => {
 		return inverterData.ac.power > 0 || inverterData.ac.online > 0
 	})) {
-		lastMeasurement[date] = data
+		lastMeasurementIsMeaningful[date] = data
 		return true;
 	}
 
