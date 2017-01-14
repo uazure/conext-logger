@@ -24,9 +24,14 @@
 			controller: ['$scope', '$stateParams', 'dayMeasurementRepository', function($scope, $stateParams, dayMeasurementRepository) {
 				var vm = $scope;
 				var date;
+				var dateParts;
 
 				if ($stateParams.date) {
+					var dateParts = requestDate.split('-');
 
+					if (dates.length == 3) {
+						date = new Date(dateParts[0], dateParts[1]-1, dateParts[2]);
+					}
 				} else {
 					date = new Date();
 				}

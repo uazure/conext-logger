@@ -1,1 +1,4 @@
-<nvd3 options="$ctrl.options" data="$ctrl.data" config="$ctrl.config"></nvd3>
+<div class="text-center" ng-show="$ctrl.isLoading">
+	<h2>Loading...</h2>
+</div>
+<nvd3 ng-hide="$ctrl.isLoading" options="$ctrl.options" data="$ctrl.data" config="$ctrl.config"></nvd3>

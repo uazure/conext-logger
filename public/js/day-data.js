@@ -23,10 +23,11 @@
 		bindings: {
 			'date': '<'
 		},
-		controller: ['dayMeasurementRepository', 'dayMeasurementAdapter', function(dayMeasurementRepository, dayMeasurementAdapter) {
+		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', function($scope, dayMeasurementRepository, dayMeasurementAdapter) {
 			var vm = this;
 
 			vm.config = {refreshDataOnly: false};
+			vm.isLoading = true;
 
 			vm.options = {
 				chart: {
@@ -80,35 +81,46 @@
 				}
 			};
 
-
-
 			vm.data = [];
 
-			dayMeasurementRepository.get()
-				.then(function(data) {
-					var meaningfulData = angular.copy(data);
+			update();
 
-					data.forEach(function(inverterData, index) {
-						var isLastMeaningful = false;
-						meaningfulData[index].values = inverterData.values.filter(
-							function(values) {
-								var isMeaningful = (values.power > 0);
-								var wasLastMeaningful = isLastMeaningful;
-								isLastMeaningful = isMeaningful;
+			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
+				update();
+			});
 
-								if (isMeaningful || wasLastMeaningful) {
-									return true;
+			function update() {
+				vm.isLoading = true;
+				dayMeasurementRepository.get(vm.date)
+					.then(function(data) {
+						var meaningfulData = angular.copy(data);
+
+						data.forEach(function(inverterData, index) {
+							var isLastMeaningful = false;
+							meaningfulData[index].values = inverterData.values.filter(
+								function(values) {
+									var isMeaningful = (values.power > 0);
+									var wasLastMeaningful = isLastMeaningful;
+									isLastMeaningful = isMeaningful;
+
+									if (isMeaningful || wasLastMeaningful) {
+										return true;
+									}
 								}
-							}
-						)
+							)
+						});
+						vm.data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
+						var maxValues = vm.data.map(function(series) {
+							return d3.max(series.values, function(value) {return value[1];});
+						})
+						var max = d3.sum(maxValues, function(x) {return x;});
+						vm.options.chart.yDomain = [0, Math.max(1, max)];
+
+						vm.isLoading = false;
 					});
-					vm.data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
-					var maxValues = vm.data.map(function(series) {
-						return d3.max(series.values, function(value) {return value[1];});
-					})
-					var max = d3.sum(maxValues, function(x) {return x;});
-					vm.options.chart.yDomain = [0, Math.max(1, max)]
-				});
+			}
+
+
 
 		}]
 	});
