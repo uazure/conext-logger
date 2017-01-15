@@ -18,45 +18,69 @@
 
 'use strict';
 
-module.exports = function(dataArray) {
+module.exports = {};
+
+module.exports.brief = function(dataArray) {
+	this.full(dataArray).forEach((inveterData) => {
+		inverterData.values = inverterData.values.map((value) => {
+			return {
+				createdAt: value.createdAt,
+				power: value.power,
+				dc1Power: dc1Power,
+				dc2Power: dc2Power
+			}
+		});
+	});
+};
+
+module.exports.full = function(dataArray) {
 	var inverters = []; // intermediate object for storing data per inverter
 
-	function getInverterObject(record) {
-		var result;
-
-		inverters.some(function(item) {
-			if (item.inverterId == record.inverter_id) {
-				result = item;
-				return true;
-			}
-
-			return false;
-		});
-
-		if (!result) {
-			result = {
-				inverterId: record.inverter_id,
-				values: []
-			};
-			inverters.push(result);
-		}
-
-		return result;
-	};
-
 	dataArray.forEach(function(item) {
-		var inverter = getInverterObject(item);
+		var inverter = getInverterObject(inverters, item);
 		var value = {
 			createdAt: item.created_at,
 			power: item.ac_power,
 			dc1Power: item.dc1_power,
 			dc2Power: item.dc2_power,
+			dc1Voltage: item.dc1_voltage,
+			dc2Voltage: item.dc2_voltage,
+			dc1Current: item.dc1_current,
+			dc2Current: item.dc2_current,
 			voltage: item.ac_voltage,
-			freq: item.ac_freq
+			current: item.ac_current,
+			freq: item.ac_freq,
+			duration: item.duration,
+			energy: item.ac_energy,
+			totalDuration: item.total_duration,
+			totalEnergy: item.total_energy
 		};
 
 		inverter.values.push(value);
 	});
 
 	return inverters;
+};
+
+function getInverterObject(inverters, record) {
+	var result;
+
+	inverters.some(function(item) {
+		if (item.inverterId == record.inverter_id) {
+			result = item;
+			return true;
+		}
+
+		return false;
+	});
+
+	if (!result) {
+		result = {
+			inverterId: record.inverter_id,
+			values: []
+		};
+		inverters.push(result);
+	}
+
+	return result;
 };

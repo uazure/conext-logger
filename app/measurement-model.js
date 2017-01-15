@@ -114,7 +114,12 @@ let Measurement = sequelize.define('measurement', {
 			return Number(this.getDataValue('total_energy'));
 		}
 	},
-	total_duration: {type: Sequelize.INTEGER}
+	total_duration: {
+		type: Sequelize.INTEGER,
+		get: function() {
+			return Number(this.getDataValue('total_duration'));
+		}
+	},
 }, {
 	createdAt: 'created_at',
 	updatedAt: false,

@@ -1,6 +1,6 @@
 {
   "name": "conext-logger",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Logger for Schneider Electric Conext RL inverter. Uses modbus protocol to read data and PostgreSQL for storage",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "conext"
   ],
   "author": "Sergii Popov",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
     "angular": "^1.5.8",
     "angular-nvd3": "^1.0.9",
@@ -24,6 +24,7 @@
     "bootstrap": "^3.3.7",
     "cors": "^2.8.1",
     "d3": "^3.5.17",
+    "d3-array": "^1.0.2",
     "express": "^4.14.0",
     "modbus-serial": "^4.5.1",
     "moment": "^2.17.1",
