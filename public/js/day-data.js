@@ -99,7 +99,7 @@
 							var isLastMeaningful = false;
 							meaningfulData[index].values = inverterData.values.filter(
 								function(values) {
-									var isMeaningful = (values.power > 0);
+									var isMeaningful = (values.dc1Power > 0 || values.dc2Power > 0);
 									var wasLastMeaningful = isLastMeaningful;
 									isLastMeaningful = isMeaningful;
 
