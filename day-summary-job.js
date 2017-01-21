@@ -34,14 +34,33 @@ module.exports = function(targetDate) {
 		date = targetDate;
 	}
 
-	measurementRepository.full(targetDate)
-		.then((data) => {
-			var models = daySummaryProcessor(targetDate, data);
+	// check if data exists
+	return daySummaryModel.count({where: {
+		date: date
+	}}).then((res) => {
+		if (res > 0) {
+			logger.log('There are records for date', date, 'will not recalculate');
+		} else {
+			return measurementRepository.full(date)
+				.then((data) => {
+					var models = daySummaryProcessor(date, data);
+					models.forEach((model) => {
+						daySummaryModel.create(model).then(() => {
+							logger.log('day summary logged', model);
+						}).catch((err) => {
+							logger.warn('day summary failed to log', err);
+						});
+					});
 
-		});
+				});
+		}
+	}).catch((res) => {
+		logger.warn('Failed to get records from db', res);
+	});
+
 }
 
 if (require.main === module) {
-	// called from console
-	module.exports('2017-01-15');
+	// called from console - run with default params
+	module.exports();
 }

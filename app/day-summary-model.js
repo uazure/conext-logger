@@ -37,38 +37,44 @@ let DaySummary = sequelize.define('daySummary', {
 		notNull: true
 	},
 	dc1_power_max: {
-		type: Sequelize.DECIMAL(5,2),
+		type: Sequelize.DECIMAL(5,3),
 		get: function() {
 			return Number(this.getDataValue('dc1_power_max'));
 		}
 	},
 	dc1_energy: {
-		type: Sequelize.DECIMAL(3,3),
+		type: Sequelize.DECIMAL(6,3),
 		get: function() {
 			return Number(this.getDataValue('dc1_energy'));
 		}
 	},
 	dc2_power_max: {
-		type: Sequelize.DECIMAL(5,2),
+		type: Sequelize.DECIMAL(5,3),
 		get: function() {
 			return Number(this.getDataValue('dc2_power_max'));
 		}
 	},
 	dc2_energy: {
-		type: Sequelize.DECIMAL(3,3),
+		type: Sequelize.DECIMAL(6,3),
 		get: function() {
 			return Number(this.getDataValue('dc2_energy'));
 		}
 	},
 	duration: {type: Sequelize.INTEGER},
 	energy: {
-		type: Sequelize.DECIMAL(3,3),
+		type: Sequelize.DECIMAL(6,3),
 		get: function() {
 			return Number(this.getDataValue('energy'));
 		}
 	},
+	power_max: {
+		type: Sequelize.DECIMAL(5,3),
+		get: function() {
+			return Number(this.getDataValue('power_max'));
+		}
+	},
 	total_energy: {
-		type: Sequelize.DECIMAL(8,3),
+		type: Sequelize.DECIMAL(10,3),
 		get: function() {
 			return Number(this.getDataValue('total_energy'));
 		}

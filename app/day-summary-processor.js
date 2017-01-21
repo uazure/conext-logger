@@ -18,12 +18,35 @@
 
 let d3 = require('d3-array');
 let uuid = require('uuid');
+let MEASUREMENT_INTERVAL_THRESHOLD = 90000; // 90 seconds to catch measurements that are made within 1 minute
+let DEFAULT_DURATION = 60000;
 
 /**
 	function to process measurements data got by measurementRepository.full()
 	returns array with models ready to be inserted to db;
 
 */
+
+// accepts array of arrays where first value is date and second is power
+function calculateTotalEnergy(values) {
+	var energy = values.reduce((value, item, index, array) => {
+		if (index === 0) {
+			return value;
+		}
+
+		let prevItem = array[index-1];
+		let duration = item[0] - prevItem[0];
+
+		if (duration > MEASUREMENT_INTERVAL_THRESHOLD) {
+			duration = DEFAULT_DURATION;
+		}
+
+		return value + duration / 1000 * prevItem[1] / 3600;
+	}, 0);
+
+	return energy
+}
+
 module.exports = function(targetDate, data) {
 	var response = [];
 
@@ -36,12 +59,19 @@ module.exports = function(targetDate, data) {
 		// dc1_power_max dc1_energy  dc2_power_max dc2_energy duration energy total_energy total_duration
 		model.dc1_power_max = d3.max(inverter.values, (value) => { return value.dc1Power; });
 		model.dc2_power_max = d3.max(inverter.values, (value) => { return value.dc2Power; });
-		model.dc1_energy = 0; // FIXME: need to implement
-		model.dc2_energy = 0; // FIXME
+		model.power_max = d3.max(inverter.values, (value) => { return value.power; });
 		model.duration = d3.max(inverter.values, (value) => { return value.duration; });
-		model.energy = d3.max(inverter.values, (value) => { return value.energy; });
+		model.energy = (inverter.values[inverter.values.length-1].totalEnergy) - (inverter.values[0].totalEnergy);
 		model.total_energy = d3.max(inverter.values, (value) => { return value.totalEnergy; });
 		model.total_duration = d3.max(inverter.values, (value) => { return value.totalDuration; });
+
+		let dc1Energy = calculateTotalEnergy(inverter.values.map((value) => {return [value.createdAt, value.dc1Power]}));
+		let dc2Energy = calculateTotalEnergy(inverter.values.map((value) => {return [value.createdAt, value.dc2Power]}));
+		let dcEnergy = dc1Energy + dc2Energy;
+
+		model.dc1_energy = Number((model.energy * dc1Energy / dcEnergy).toFixed(3));
+		model.dc2_energy = Number((model.energy * dc2Energy / dcEnergy).toFixed(3));
+		model.energy = Number(model.energy.toFixed(3));
 
 		response.push(model);
 	});

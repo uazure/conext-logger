@@ -31,17 +31,31 @@ let jsonResponse = require('./app/json-response-factory');
 app.use(cors());
 app.options('*', cors());
 
-// app.get('/api/state', function(req, res) {
-// 	res.set({
-// 		'Cache-control': 'no-cache, no-store, must-revalidate'
-// 	});
-// 	deviceManager.readAll().then((data) => {
-// 		res.json({success: true, payload: data});
-// 	})
-// 	.catch((err) => {
-// 		res.status(503).json({success: false, payload: err});
-// 	});
-// });
+app.get('/api/state', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
+	deviceManager.readAll().then((data) => {
+		jsonResponse.success(data);
+	})
+	.catch((err) => {
+		res.status(503).json(jsonResponse.error(err)});
+	});
+});
+
+app.get('/api/day/summary/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
+
+	daySummaryRepository.getDay(req.params.date)
+		.then((data) => {
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
+});
 
 app.get('/api/day/:date?', function(req, res) {
 	res.set({
@@ -52,30 +66,9 @@ app.get('/api/day/:date?', function(req, res) {
 		.then((data) => {
 			res.json(jsonResponse.success(data));
 		})
-		.catch((res) => {
-			res.json(jsonResponse.error('Failed to get data'));
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
 		});
-});
-
-app.get('/api/daysummary/:date?', function(req, res) {
-	res.set({
-		'Cache-control': 'no-cache, no-store, must-revalidate'
-	});
-
-	daySummaryRepository()
-		.then((data) => {
-			res.json(jsonResponse.success(data))
-		});
-
-});
-
-app.get('/api/alltime', function(req, res) {
-	res.set({
-		'Cache-control': 'no-cache, no-store, must-revalidate'
-	});
-	measurement.findAll()
-		.then((data) => {res.json(data)})
-		.catch((err) => {res.json({error: true, details: err})})
 });
 
 // serve static files from 'public' dir
@@ -83,6 +76,6 @@ app.use(express.static(__dirname + '/public'));
 
 app.listen(config.port, function() {
 	console.log('Running on port', config.port);
-	// console.log('Launching scheduler');
-	// require('./schedule')();
+	console.log('Launching scheduler');
+	require('./schedule')();
 });

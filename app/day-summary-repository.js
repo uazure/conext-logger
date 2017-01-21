@@ -20,6 +20,36 @@
 Export function that accepts date string as parameter (in format YYYY-MM-DD)
 and returns promise which is resolved with array of inverters data
 */
-module.exports = function(date) {
-	//TODO: must return promise that is resolved with data from db
-}
+
+let daySummaryModel = require('./day-summary-model');
+let arrayConverter = require('./day-summary-model-array-converter');
+let moment = require('moment');
+
+module.exports = {};
+
+module.exports.getDay = function(dateString) {
+	return getData(dateString).then((data) => {
+		return arrayConverter(data);
+	});
+
+	function getData(dateString) {
+		if (!dateString) {
+			dateString = moment().format('YYYY-MM-DD');
+		}
+
+
+		return daySummaryModel.findAll({
+			where: {
+				date: dateString
+			},
+			order: [
+				['inverter_id', 'ASC']
+			]
+		});
+	}
+};
+
+// To be implemented
+// module.exports.getRange = function(startDateString, endDateString) {
+//
+// }
