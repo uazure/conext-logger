@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+'use strict';
+
 let d3 = require('d3-array');
 let uuid = require('uuid');
 let MEASUREMENT_INTERVAL_THRESHOLD = 90000; // 90 seconds to catch measurements that are made within 1 minute

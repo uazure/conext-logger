@@ -21,6 +21,8 @@ Export function that accepts date string as parameter (in format YYYY-MM-DD)
 and returns promise which is resolved with array of inverters data
 */
 
+'use strict';
+
 let daySummaryModel = require('./day-summary-model');
 let arrayConverter = require('./day-summary-model-array-converter');
 let moment = require('moment');

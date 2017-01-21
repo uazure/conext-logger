@@ -39,7 +39,7 @@ app.get('/api/state', function(req, res) {
 		jsonResponse.success(data);
 	})
 	.catch((err) => {
-		res.status(503).json(jsonResponse.error(err)});
+		res.status(503).json(jsonResponse.error(err));
 	});
 });
 
