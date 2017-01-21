@@ -36,7 +36,7 @@ app.get('/api/state', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 	deviceManager.readAll().then((data) => {
-		jsonResponse.success(data);
+		res.json(jsonResponse.success(data));
 	})
 	.catch((err) => {
 		res.status(503).json(jsonResponse.error(err));
