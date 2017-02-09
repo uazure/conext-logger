@@ -2,7 +2,7 @@ module.exports = {
 	telegram: {
 		token: 'YOUR_TELEGRAM_BOT_TOKEN',
 		chatIds: [
-			'128098659'
+			'123123123'
 		]
 	}
 };

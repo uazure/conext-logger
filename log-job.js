@@ -23,6 +23,8 @@ var deviceManager = require('./app/device-manager');
 var measurement = require('./app/measurement-model');
 var logger = require('./app/logger');
 var moment = require('moment');
+var pubsub = require('./app/pubsub');
+var shouldReportError = true;
 
 var ConextModelConverter = function(conextModel) {
 	let model = {};
@@ -54,17 +56,19 @@ var ConextModelConverter = function(conextModel) {
 
 var lastMeasurementIsMeaningful = {};
 
+require('./app/telegram-bot');
+
 function isUpdateNeeded(date, data) {
 	let isLastMeaningful = lastMeasurementIsMeaningful[date];
 	let isCurrentDataMeaningful = isDataMeaningful(data, date);
 	let isRecordPresent = date in lastMeasurementIsMeaningful;
 
 	if (isLastMeaningful && !isCurrentDataMeaningful) {
-		let bot = require('./app/telegram-bot');
+		pubsub.emit('lastMeasurement', data);
+	}
 
-		if (bot) {
-			bot.broadcast(JSON.stringify(data));
-		}
+	if (!isLastMeaningful && isCurrentDataMeaningful) {
+		pubsub.emit('firstMeasurement', data);
 	}
 
 	lastMeasurementIsMeaningful[date] = isCurrentDataMeaningful;
@@ -94,6 +98,7 @@ module.exports = function() {
 	deviceManager.readAll()
 		.then((data) => {
 			logger.log('got data', data);
+			shouldReportError = true;
 
 			if (isUpdateNeeded(date, data)) {
 				data.forEach((res) => {
@@ -108,7 +113,11 @@ module.exports = function() {
 
 		})
 		.catch((err) => {
+			if (shouldReportError) {
+				pubsub.emit('readError', err);
+			}
 			logger.warn('Failed to read data from inverter', err);
+			shouldReportError = false;
 		});
 };
 

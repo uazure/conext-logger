@@ -17,11 +17,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+var pubsub = require('./pubsub');
 var localConfig;
 var TelegramBot;
 var token;
 var chatIds;
 var bot;
+var service = null;
 
 try {
 	localConfig = require('../local-config');
@@ -31,6 +33,7 @@ try {
 	bot = new TelegramBot(token, { polling: false });
 } catch (er) {
 	bot = null;
+	console.error('Error, ', er);
 }
 
 // uncomment to define chat id. Launch and send message to a bot
@@ -42,16 +45,37 @@ try {
 // });
 
 if (bot) {
-	module.exports = {
-		broadcast: function(msg) {
 
+	service = {
+		broadcast: function(msg) {
 			chatIds.forEach((chatId) => {
 				bot.sendMessage(chatId, msg);
 			});
 		}
 	};
-} else {
-	module.exports = null;
+
+	pubsub.on('lastMeasurement', (data) => {
+		service.broadcast(lastMeasurementFormatter(data));
+	});
+	pubsub.on('firstMeasurement', () => {
+		service.broadcast('Sunrise wakes up! Go solar!');
+	});
+	pubsub.on('readError', (msg) => {
+		service.broadcast('Read error: ' + msg);
+	});
 }
 
-module.exports.broadcast('test2');
+function lastMeasurementFormatter(data) {
+	var totalYield = data.reduce((sum, res) => {
+		return sum + res.ac.energy;
+	}, 0);
+
+	var msg = `Yield is ${totalYield} kWh.`;
+	var inverterYield = data.reduce((msg, res) => {
+		return msg + `\n\tInverter ${res.inverterId}: ${res.ac.energy} kWh`;
+	}, '');
+
+	return msg + inverterYield;
+}
+
+module.exports = service;
