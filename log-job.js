@@ -26,6 +26,7 @@ var moment = require('moment');
 
 var ConextModelConverter = function(conextModel) {
 	let model = {};
+
 	model.id = uuid.v4();
 	model.inverter_id = conextModel.inverterId;
 	model.dc1_voltage = conextModel.dc[0].voltage;
@@ -47,6 +48,7 @@ var ConextModelConverter = function(conextModel) {
 	model.total_energy = conextModel.ac.totalEnergy;
 	model.total_duration = conextModel.ac.totalDuration;
 	model.state = conextModel.ac.state;
+
 	return model;
 };
 
@@ -56,26 +58,35 @@ function isUpdateNeeded(date, data) {
 	let isLastMeaningful = lastMeasurementIsMeaningful[date];
 	let isCurrentDataMeaningful = isDataMeaningful(data, date);
 	let isRecordPresent = date in lastMeasurementIsMeaningful;
+
+	if (isLastMeaningful && !isCurrentDataMeaningful) {
+		let bot = require('./app/telegram-bot');
+
+		if (bot) {
+			bot.broadcast(JSON.stringify(data));
+		}
+	}
+
 	lastMeasurementIsMeaningful[date] = isCurrentDataMeaningful;
 
 	if (isCurrentDataMeaningful || !isRecordPresent || isLastMeaningful) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-function isDataMeaningful(data, date) {
-	if (data.some((inverterData) => {
-		return inverterData.ac.power > 0 || inverterData.ac.online > 0
-	})) {
-		lastMeasurementIsMeaningful[date] = data
 		return true;
 	}
 
 	return false;
 }
 
+function isDataMeaningful(data, date) {
+	if (data.some((inverterData) => {
+		return inverterData.ac.power > 0 || inverterData.ac.online > 0;
+	})) {
+		lastMeasurementIsMeaningful[date] = data;
+
+		return true;
+	}
+
+	return false;
+}
 
 module.exports = function() {
 	var date = moment().format('YYYY-MM-DD');
@@ -99,7 +110,7 @@ module.exports = function() {
 		.catch((err) => {
 			logger.warn('Failed to read data from inverter', err);
 		});
-}
+};
 
 if (require.main === module) {
 	// called from console
