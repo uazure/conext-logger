@@ -24,7 +24,9 @@ var cors = require('cors');
 var config = require('./config');
 var deviceManager = require('./app/device-manager');
 var measurement = require('./app/measurement-model');
-var measurementArrayConverter = require('./app/measurement-model-array-converter');
+let measurementRepository = require('./app/measurement-repository');
+let daySummaryRepository = require('./app/day-summary-repository');
+let jsonResponse = require('./app/json-response-factory');
 
 app.use(cors());
 app.options('*', cors());
@@ -34,59 +36,39 @@ app.get('/api/state', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 	deviceManager.readAll().then((data) => {
-		res.json({success: true, payload: data});
+		res.json(jsonResponse.success(data));
 	})
 	.catch((err) => {
-		res.status(503).json({success: false, payload: err});
+		res.status(503).json(jsonResponse.error(err));
 	});
+});
+
+app.get('/api/day/summary/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
+
+	daySummaryRepository.getDay(req.params.date)
+		.then((data) => {
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
 });
 
 app.get('/api/day/:date?', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
-	let targetDateEnd;
-	let targetDateStart;
-	let requestDate = req.params.date;
 
-	if (!requestDate) {
-		targetDateEnd = new Date();
-		let year = targetDateEnd.getFullYear();
-		let month = targetDateEnd.getMonth();
-		let day = targetDateEnd.getDate();
-		targetDateStart = new Date(year, month, day);
-	} else {
-		let dates = requestDate.split('-');
-		if (dates.length == 3) {
-			let date = new Date(dates[0], dates[1]-1, dates[2]);
-			targetDateStart = date;
-			targetDateEnd = new Date(date.valueOf() + 24*3600*1000);
-		}
-	}
-
-	measurement.findAll({
-		where: {
-			created_at: {
-				$lt: targetDateEnd,
-				$gt: targetDateStart
-			}
-		},
-		order: [
-			['created_at', 'ASC']
-		]
-	})
+	measurementRepository.brief(req.params.date)
 		.then((data) => {
-
-			res.json(measurementArrayConverter(data))});
-});
-
-app.get('/api/alltime', function(req, res) {
-	res.set({
-		'Cache-control': 'no-cache, no-store, must-revalidate'
-	});
-	measurement.findAll()
-		.then((data) => {res.json(data)})
-		.catch((err) => {res.json({error: true, details: err})})
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
 });
 
 // serve static files from 'public' dir

@@ -16,29 +16,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(function(angular) {
-	'use strict';
-	angular.module('app').factory('dayMeasurementRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+/**
+That's a collection of factories for generating standard json responses
+usage:
+let jsonResponse = require('./app/json-reponse-factory');
+if (...) {
+	var data = {...};
+	return jsonResponse.success(data);
+} else {
+	return jsonResponse.error('Error occured');
+}
+
+*/
+module.exports = {
+	success: function(payload) {
 		return {
-			get: function(date) {
-				if (!date) {
-					date = new Date();
-				}
-
-				var dateString = $filter('date')(date, 'yyyy-MM-dd');
-
-				return $http.get(appConfig.backend + 'api/day/' + dateString)
-					.then(function(data) {
-						if (data.data.success) {
-							return data.data.payload;
-						} else {
-							return $q(function(resolve, reject) {
-								reject(data.data.payload);
-							})
-						}
-					});
-			}
+			success: true,
+			payload: payload
 		}
-	}]
-	);
-}(window.angular));
+	},
+	error: function(errorMessage) {
+		return {
+			success: false,
+			payload: errorMessage
+		}
+	}
+}

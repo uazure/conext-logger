@@ -18,7 +18,7 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').factory('dayMeasurementRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+	angular.module('app').factory('daySummaryRepository', ['$http', '$filter', '$q', 'appConfig', function($http, $filter, $q, appConfig) {
 		return {
 			get: function(date) {
 				if (!date) {
@@ -27,7 +27,7 @@
 
 				var dateString = $filter('date')(date, 'yyyy-MM-dd');
 
-				return $http.get(appConfig.backend + 'api/day/' + dateString)
+				return $http.get(appConfig.backend + 'api/day/summary/' + dateString)
 					.then(function(data) {
 						if (data.data.success) {
 							return data.data.payload;

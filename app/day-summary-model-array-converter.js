@@ -17,46 +17,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+let moment = require('moment');
 
-module.exports = {};
-
-module.exports.brief = function(dataArray) {
-	var inverters = this.full(dataArray);
-	inverters.forEach((inverterData) => {
-		inverterData.values = inverterData.values.map((value) => {
-			return {
-				createdAt: value.createdAt,
-				power: value.power,
-				dc1Power: value.dc1Power,
-				dc2Power: value.dc2Power
-			}
-		});
-	});
-
-	return inverters;
-};
-
-module.exports.full = function(dataArray) {
+module.exports = function(dataArray) {
 	var inverters = []; // intermediate object for storing data per inverter
 
 	dataArray.forEach(function(item) {
 		var inverter = getInverterObject(inverters, item);
 		var value = {
-			createdAt: item.created_at,
-			power: item.ac_power,
-			dc1Power: item.dc1_power,
-			dc2Power: item.dc2_power,
-			dc1Voltage: item.dc1_voltage,
-			dc2Voltage: item.dc2_voltage,
-			dc1Current: item.dc1_current,
-			dc2Current: item.dc2_current,
-			voltage: item.ac_voltage,
-			current: item.ac_current,
-			freq: item.ac_freq,
-			duration: item.duration,
-			energy: item.ac_energy,
-			totalDuration: item.total_duration,
-			totalEnergy: item.total_energy
+			date: moment(item.date).format('YYYY-MM-DD'),
+			energy: item.energy,
+			powerMax: item.power_max,
+			dc1PowerMax: item.dc1_power_max,
+			dc1Energy: item.dc1_energy,
+			dc2PowerMax: item.dc2_power_max,
+			dc2Energy: item.dc2_energy,
+			duration: item.duration
 		};
 
 		inverter.values.push(value);

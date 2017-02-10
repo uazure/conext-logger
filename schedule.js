@@ -17,9 +17,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var crontab = require('node-crontab');
-var LogJob = require('./log-job');
+var logJob = require('./log-job');
+var daySummaryJob = require('./day-summary-job');
 
 module.exports = function() {
 	//save values to db every minute
-	crontab.scheduleJob('* * * * *', LogJob);
+	crontab.scheduleJob('* * * * *', logJob);
+	// run daySummaryJob on 23:59 each day
+	crontab.scheduleJob('59 23 * * *', daySummaryJob);
 };

@@ -26,25 +26,20 @@ let sequelize = new Sequelize(config.db.connectionString, {
 	logging: logger.log
 });
 
-let Measurement = sequelize.define('measurement', {
+let DaySummary = sequelize.define('daySummary', {
 	id: {type: Sequelize.UUID, primaryKey: true},
-	inverter_id: {type: Sequelize.INTEGER, notNull: true},
-	dc1_voltage: {
-		type: Sequelize.DECIMAL(5,2),
-		get: function() {
-			return Number(this.getDataValue('dc1_voltage'));
-		}
+	date: {
+		type: Sequelize.DATEONLY,
+		notNull: true
 	},
-	dc1_current: {
-		type: Sequelize.DECIMAL(4,2),
-		get: function() {
-			return Number(this.getDataValue('dc1_current'));
-		}
+	inverter_id: {
+		type: Sequelize.INTEGER,
+		notNull: true
 	},
-	dc1_power: {
+	dc1_power_max: {
 		type: Sequelize.DECIMAL(5,3),
 		get: function() {
-			return Number(this.getDataValue('dc1_power'));
+			return Number(this.getDataValue('dc1_power_max'));
 		}
 	},
 	dc1_energy: {
@@ -53,22 +48,10 @@ let Measurement = sequelize.define('measurement', {
 			return Number(this.getDataValue('dc1_energy'));
 		}
 	},
-	dc2_voltage: {
-		type: Sequelize.DECIMAL(5,2),
-		get: function() {
-			return Number(this.getDataValue('dc2_voltage'));
-		}
-	},
-	dc2_current: {
-		type: Sequelize.DECIMAL(4,2),
-		get: function() {
-			return Number(this.getDataValue('dc2_current'));
-		}
-	},
-	dc2_power: {
+	dc2_power_max: {
 		type: Sequelize.DECIMAL(5,3),
 		get: function() {
-			return Number(this.getDataValue('dc2_power'));
+			return Number(this.getDataValue('dc2_power_max'));
 		}
 	},
 	dc2_energy: {
@@ -77,60 +60,37 @@ let Measurement = sequelize.define('measurement', {
 			return Number(this.getDataValue('dc2_energy'));
 		}
 	},
-	ac_voltage: {
-		type: Sequelize.DECIMAL(5,2),
-		get: function() {
-			return Number(this.getDataValue('ac_voltage'));
-		}
-	},
-	ac_current: {
-		type: Sequelize.DECIMAL(4,2),
-		get: function() {
-			return Number(this.getDataValue('ac_current'));
-		}
-	},
-	ac_power: {
-		type: Sequelize.DECIMAL(5,3),
-		get: function() {
-			return Number(this.getDataValue('ac_power'));
-		}
-	},
-	ac_energy: {
+	duration: {type: Sequelize.INTEGER},
+	energy: {
 		type: Sequelize.DECIMAL(6,3),
 		get: function() {
-			return Number(this.getDataValue('ac_energy'));
+			return Number(this.getDataValue('energy'));
 		}
 	},
-	ac_freq: {
-		type: Sequelize.DECIMAL(4,2),
+	power_max: {
+		type: Sequelize.DECIMAL(5,3),
 		get: function() {
-			return Number(this.getDataValue('ac_freq'));
+			return Number(this.getDataValue('power_max'));
 		}
 	},
-	duration: {type: Sequelize.INTEGER},
 	total_energy: {
-		type: Sequelize.DECIMAL(8,3),
+		type: Sequelize.DECIMAL(10,3),
 		get: function() {
 			return Number(this.getDataValue('total_energy'));
 		}
 	},
-	total_duration: {
-		type: Sequelize.INTEGER,
-		get: function() {
-			return Number(this.getDataValue('total_duration'));
-		}
-	},
+	total_duration: {type: Sequelize.INTEGER}
 }, {
-	createdAt: 'created_at',
+	createdAt: false,
 	updatedAt: false,
 	indexes: [
 		{
 			fields: ['inverter_id']
 		},
 		{
-			fields: ['created_at']
+			fields: ['date']
 		}
 	]
 });
 
-module.exports = Measurement;
+module.exports = DaySummary;

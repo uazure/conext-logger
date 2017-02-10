@@ -18,27 +18,34 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').factory('dayMeasurementRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
-		return {
-			get: function(date) {
-				if (!date) {
-					date = new Date();
-				}
+	angular.module('app').component('daySummary', {
+		templateUrl: 'partials/day-summary.html',
+		bindings: {
+			'date': '<'
+		},
+		controller: ['$scope', 'daySummaryRepository', function($scope, daySummaryRepository) {
+			var vm = this;
+			vm.summaryData = {};
 
-				var dateString = $filter('date')(date, 'yyyy-MM-dd');
+			vm.isLoading = true;
 
-				return $http.get(appConfig.backend + 'api/day/' + dateString)
+			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
+				update();
+			});
+
+			function update() {
+				vm.isLoading = true;
+				vm.summaryData = {};
+				daySummaryRepository.get(vm.date)
 					.then(function(data) {
-						if (data.data.success) {
-							return data.data.payload;
-						} else {
-							return $q(function(resolve, reject) {
-								reject(data.data.payload);
-							})
-						}
+						vm.summaryData = data;
+						vm.isLoading = false;
+					})
+					.catch(function(errorMessage) {
+						vm.isLoading = false;
+						vm.errorMessage = errorMessage;
 					});
 			}
-		}
-	}]
-	);
-}(window.angular));
+		}]
+	});
+}(angular));
