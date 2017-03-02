@@ -92,7 +92,8 @@
 			function update() {
 				vm.isLoading = true;
 				dayMeasurementRepository.get(vm.date)
-					.then(function(data) {
+					.then(function(repositoryData) {
+						var data = repositoryData.measurements;
 						var meaningfulData = angular.copy(data);
 
 						data.forEach(function(inverterData, index) {

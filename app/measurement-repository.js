@@ -23,8 +23,9 @@ and returns promise which is resolved with array of inverters data
 
 'use strict';
 
-let measurement = require('./measurement-model');
+let measurement = require('./model/measurement-model');
 let measurementArrayConverter = require('./measurement-model-array-converter');
+let moment = require('moment');
 
 module.exports = {};
 module.exports.brief = function(date) {
@@ -41,31 +42,23 @@ module.exports.full = function(date) {
 			});
 }
 
-function getData(date) {
-	let targetDateEnd;
-	let targetDateStart;
-	let requestDate = date;
+function getData(requestDate) {
+	let momentEnd;
+	let momentStart;
 
 	if (!requestDate) {
-		targetDateEnd = new Date();
-		let year = targetDateEnd.getFullYear();
-		let month = targetDateEnd.getMonth();
-		let day = targetDateEnd.getDate();
-		targetDateStart = new Date(year, month, day);
+		momentEnd = moment();
+		momentStart = momentEnd.clone().startOf('day');
 	} else {
-		let dates = requestDate.split('-');
-		if (dates.length == 3) {
-			let date = new Date(dates[0], dates[1]-1, dates[2]);
-			targetDateStart = date;
-			targetDateEnd = new Date(date.valueOf() + 24*3600*1000);
-		}
+		momentStart = moment(requestDate);
+		momentEnd = momentStart.clone().endOf('day');
 	}
 
 	return measurement.findAll({
 		where: {
 			created_at: {
-				$lt: targetDateEnd,
-				$gt: targetDateStart
+				$lt: momentEnd.toDate(),
+				$gt: momentStart.toDate()
 			}
 		},
 		order: [

@@ -21,7 +21,7 @@ let config = require('./config');
 let logger = require('./app/logger');
 let moment = require('moment');
 let measurementRepository = require('./app/measurement-repository');
-let daySummaryModel = require('./app/day-summary-model');
+let daySummaryModel = require('./app/model/day-summary-model');
 let daySummaryProcessor = require('./app/day-summary-processor');
 
 // targetDate must be in format YYYY-MM-DD;

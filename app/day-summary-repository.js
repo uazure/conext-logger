@@ -23,7 +23,7 @@ and returns promise which is resolved with array of inverters data
 
 'use strict';
 
-let daySummaryModel = require('./day-summary-model');
+let daySummaryModel = require('./model/day-summary-model');
 let arrayConverter = require('./day-summary-model-array-converter');
 let moment = require('moment');
 

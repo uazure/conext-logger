@@ -18,11 +18,11 @@
 
 'use strict';
 var ModbusRTU = require("modbus-serial");
-var modbusConfig = require('./modbus-config.js');
-var ConextReader = require('./conext-rl-module');
-var config = require('../config.js');
-var logger = require('./logger');
-var Promise = require('bluebird');
+var modbusConfig = require('../modbus-config.js');
+var ConextReader = require('../conext-rl-module');
+var config = require('../../config.js');
+var logger = require('../logger');
+//var Promise = require('bluebird');
 
 
 var prevPromiseReply = null;
@@ -35,15 +35,13 @@ var connectedPromise;
 
 // instantiate objects related to data readers (inverters)
 config.inverters.forEach((inv) => {
-	let inverterClass = require('./' + inv.module);
+	let inverterClass = require('../' + inv.module);
 	let instance = new inverterClass(inv.id, client);
 	inverters.push(instance);
 })
 
 var pendingReply;
 var failedReads = 0;
-
-
 
 var manager = {
 	connect: function() {
