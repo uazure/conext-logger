@@ -18,6 +18,52 @@
 
 let inverterConfigModel = require('../model/inverter-config-model');
 let moment = require('moment');
+let logger = require('../logger');
+
+function inverterConfigConverter(configs) {
+	let result = configs.map((model) => {
+		let resultModel = {
+			inverterId: model.inverter_id,
+			name: model.inverter_name,
+			power: model.inverter_ac_power,
+			startDate: model.inverter_start_date,
+			dc: []
+		};
+		resultModel.dc.push({
+			name: model.dc1_panel_name,
+			startDate: model.dc1_panel_start_date,
+			qty: model.dc1_panel_qty,
+			power: model.dc1_panel_power,
+			location: model.dc1_panel_location,
+			tilt: model.dc1_panel_tilt,
+			azimut: model.dc1_panel_azimut,
+			voltageMax: model.dc1_panel_voltage_max,
+			currentMax: model.dc1_panel_current_max,
+			voltageNominal: model.dc1_panel_voltage_nominal,
+			currentNominal: model.dc1_panel_current_nominal
+		});
+
+		if (model.dc2_panel_name) {
+			resultModel.dc.push({
+				name: model.dc2_panel_name,
+				startDate: model.dc2_panel_start_date,
+				qty: model.dc2_panel_qty,
+				power: model.dc2_panel_power,
+				location: model.dc2_panel_location,
+				tilt: model.dc2_panel_tilt,
+				azimut: model.dc2_panel_azimut,
+				voltageMax: model.dc2_panel_voltage_max,
+				currentMax: model.dc2_panel_current_max,
+				voltageNominal: model.dc2_panel_voltage_nominal,
+				currentNominal: model.dc2_panel_current_nominal
+			});
+		}
+
+		return resultModel;
+	});
+
+	return result;
+}
 
 module.exports = {
 	getInverterConfig: function(dateString) {
@@ -36,7 +82,14 @@ module.exports = {
 				}
 			}
 		}).then(function(res) {
-			console.log('got res', res);
+			if (res.length == 0) {
+				return null;
+			}
+
+			let result = inverterConfigConverter(res);
+			logger.debug('Config is', result);
+
+			return result;
 		});
 
 		return promise;

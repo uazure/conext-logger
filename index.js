@@ -26,6 +26,7 @@ var deviceManager = require('./app/device-manager');
 var measurement = require('./app/measurement-model');
 let measurementRepository = require('./app/measurement-repository');
 let daySummaryRepository = require('./app/day-summary-repository');
+let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
 let jsonResponse = require('./app/json-response-factory');
 
 app.use(cors());
@@ -63,6 +64,20 @@ app.get('/api/day/:date?', function(req, res) {
 	});
 
 	measurementRepository.brief(req.params.date)
+		.then((data) => {
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
+});
+
+app.get('/api/inverter-config/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'cache'
+	});
+
+	inverterConfigManager.getInverterConfig(req.params.date)
 		.then((data) => {
 			res.json(jsonResponse.success(data));
 		})

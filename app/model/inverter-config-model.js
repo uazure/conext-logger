@@ -118,7 +118,7 @@ let model = sequelize.define('inverterConfig', {
 	inverter_ac_power: {
 		type: Sequelize.DECIMAL(5,3),
 		get: function() {
-			return Number(this.getDataValue('ac_power'));
+			return Number(this.getDataValue('inverter_ac_power'));
 		}
 	},
 	inverter_start_date: {type: Sequelize.DATEONLY}
