@@ -87,9 +87,17 @@ module.exports = {
 			}
 
 			let result = inverterConfigConverter(res);
-			logger.debug('Config is', result);
+			// convert to key-value
 
-			return result;
+			let config = {};
+			result.forEach((inv) => {
+				config[inv.inverterId] = {};
+				Object.assign(config[inv.inverterId], inv);
+				delete config[inv.inverterId].inverterId;
+			});
+			logger.debug('Config is', config);
+
+			return config;
 		});
 
 		return promise;

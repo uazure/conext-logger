@@ -61,20 +61,23 @@ app.get('/api/day/summary/:date?', function(req, res) {
 		});
 });
 
+app.get('/api/month/:date?', function(req, res) {
+	let monthStatPromise = monthStatManager.get(req.params.date);
+	monthStatPromise.then((data) => {
+		res.json(jsonResponse.success(data));
+	});
+});
+
 app.get('/api/day/:date?', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
 	let measurementsPromise = measurementRepository.brief(req.params.date)
-	let monthStatPromise = monthStatManager.get(req.params.date);
 
-	Promise.all([measurementsPromise, monthStatPromise])
+	measurementsPromise
 		.then((data) => {
-			res.json(jsonResponse.success({
-				measurements: data[0],
-				monthStat: data[1]
-			}));
+			res.json(jsonResponse.success(data));
 		})
 		.catch(() => {
 			res.status(503).json(jsonResponse.error('Failed to get data'));

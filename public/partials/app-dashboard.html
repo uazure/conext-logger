@@ -1,45 +1,65 @@
 <div class="container">
 	<div class="row">
-		<div class="col-md-4 col-xs-12">
-			<h2>Now</h2>
-			<div>{{ currentMeasurement[0].createdAt | date : 'medium' }}</div>
-			<div ng-repeat="inverter in currentMeasurement">
-				<h3>Inverter ID: {{ inverter.inverterId }}</h3>
-				<div class="col-xs-6">Power:</div><div class="col-xs-6">{{ inverter.ac.power | number : 3 }} kW</div>
-				<div ng-show="showDetails">
-					<div class="col-xs-6">Voltage:</div><div class="col-xs-6">{{ inverter.ac.voltage | number : 1}} V</div>
-					<div class="col-xs-6">Current:</div><div class="col-xs-6">{{ inverter.ac.current | number : 1}} A</div>
-					<div class="col-xs-6">Frequency:</div><div class="col-xs-6">{{ inverter.ac.freq | number : 2}} Hz</div>
+		<div class="col-md-6 col-xs-12 panel panel-default no-padding-x" ng-repeat="inverter in currentMeasurement">
+
+			<div class="panel-heading padding-sm">#{{ inverter.inverterId }} {{inverterConfig[inverter.inverterId].name}}</div>
+			<div class="no-padding-x">
+				<div class="panel panel-default col-sm-12 no-padding-x no-border-top no-border-left no-border-right">
+					<div class="panel-heading padding-xs">
+						AC
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-2">Power</div>
+							<div class="col-xs-2 padding-x-xs"><strong>{{inverter.ac.power | number: 3}}</strong> kW</div>
+							<div class="col-xs-2 padding-x-xs"><progress max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100}}%</progress></div>
+						</div>
+						<div class="row">
+							<div class="col-xs-2">Today</div>
+							<div class="col-xs-2 padding-x-xs">{{inverter.ac.energy | number: 1}} kWh</div>
+							<div class="col-xs-2 padding-x-xs"></div>
+						</div>
+						<div class="row" ng-show="monthStat[inverter.inverterId].startEnergy">
+							<div class="col-xs-2">Month</div>
+							<div class="col-xs-2 padding-x-xs">{{ inverter.ac.totalEnergy - monthStat[inverter.inverterId].startEnergy  | number: 1}} kWh</div>
+							<div class="col-xs-2 padding-x-xs"></div>
+						</div>
+					</div>
 				</div>
 
-				<div class="col-xs-6">DC1 Power:</div><div class="col-xs-6">{{ inverter.dc[0].power | number : 3}} kW</div>
-				<div ng-show="showDetails">
-					<div class="col-xs-6">DC1 Voltage:</div><div class="col-xs-6">{{ inverter.dc[0].voltage | number : 1}} V</div>
-					<div class="col-xs-6">DC1 Current:</div><div class="col-xs-6">{{ inverter.dc[0].current | number : 1}} A</div>
+				<div class="panel panel-default col-md-6 no-padding-x" ng-repeat="dc in inverter.dc">
+					{{ dcConfig = inverterConfig[inverter.inverterId].dc[$index];"" }}
+					<div class="panel-heading padding-xs text-overflow">
+						DC {{$index + 1}} {{ dcConfig.name }}
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-4">Power</div>
+							<div class="col-xs-4 padding-x-xs">{{dc.power}} kW</div>
+							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.power * dcConfig.qty / 1000}}" value="{{dc.power}}">{{ dc.power / (dcConfig.power * dcConfig.qty / 1000) * 100}}%</progress></div>
+						</div>
+						<div class="row">
+							<div class="col-xs-4">Voltage</div>
+							<div class="col-xs-4 padding-x-xs">{{dc.voltage | number : 1}} V</div>
+							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.voltageNominal * dcConfig.qty}}" value="{{dc.voltage}}">{{ dc.voltage / (dcConfig.voltageNominal * dcConfig.qty) * 100}}%</progress></div>
+						</div>
+						<div class="row">
+							<div class="col-xs-4">Current</div>
+							<div class="col-xs-4 padding-x-xs">{{dc.current | number : 2}} A</div>
+							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.currentNominal}}" value="{{dc.current}}">{{ dc.current / (dcConfig.currentNominal * dcConfig.qty) * 100}}%</progress></div>
+						</div>
+					</div>
 				</div>
 
-				<div class="col-xs-6">DC2 Power:</div><div class="col-xs-6">{{ inverter.dc[1].power | number: 3 }} kW</div>
-				<div ng-show="showDetails">
-					<div class="col-xs-6">DC2 Voltage:</div><div class="col-xs-6">{{ inverter.dc[1].voltage | number: 1 }} V</div>
-					<div class="col-xs-6">DC2 Current:</div><div class="col-xs-6">{{ inverter.dc[1].current | number: 1 }} A</div>
-				</div>
-
-				<a href="#details" ng-click="toggleShowDetails()">show details</a><br/>
-				<div class="col-xs-6"></div><div class="col-xs-6"></div>
-
-				<h2>Today</h2>
-				<div class="col-xs-6">Energy:</div><div class="col-xs-6">{{ inverter.ac.energy | number: 3 }} kWh</div>
-				<div class="col-xs-6">Time:</div><div class="col-xs-6">{{ inverter.ac.duration * 1000 | date : 'HH:mm' : '+0000' }}</div>
-
-				<h2>Lifetime</h2>
-				<div class="col-xs-6">Energy:</div><div class="col-xs-6">{{ inverter.ac.totalEnergy | number: 3 }} kWh</div>
-				<div class="col-xs-6">Time:</div><div class="col-xs-6" title="Months-days Hours:minutes">{{ inverter.ac.totalDuration * 1000 | date : 'MM-dd HH:mm' : '+0000' }}</div>
 			</div>
+
 		</div>
+	</div>
+	<div class="row">
 		<div class="col-md-8 col-xs-12">
 			<h3>Power chart</h3>
 			<day-data></day-data>
 		</div>
 	</div>
-	
+
 </div>

@@ -27,7 +27,8 @@
 			var vm = this;
 
 			vm.config = {refreshDataOnly: false};
-			vm.isLoading = true;
+			vm.isReady = false;
+			vm.isLoading = false;
 
 			vm.options = {
 				chart: {
@@ -90,10 +91,13 @@
 			});
 
 			function update() {
+				if (vm.isLoading) {
+					return;
+				}
 				vm.isLoading = true;
 				dayMeasurementRepository.get(vm.date)
 					.then(function(repositoryData) {
-						var data = repositoryData.measurements;
+						var data = repositoryData;
 						var meaningfulData = angular.copy(data);
 
 						data.forEach(function(inverterData, index) {
@@ -118,6 +122,7 @@
 						vm.options.chart.yDomain = [0, Math.max(1, max)];
 
 						vm.isLoading = false;
+						vm.isReady = true;
 					});
 			}
 

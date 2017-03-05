@@ -16,28 +16,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-let measurement = require('../model/measurement-model');
-let daySummaryModel = require('../model/day-summary-model');
-let arrayConverter = require('../day-summary-model-array-converter');
-let sequelize = require('sequelize');
-let moment = require('moment');
-let logger = require('../logger');
-
-module.exports = {
-	get: function(dateString) {
-		let startOfMonthMoment = moment(dateString).startOf('month');
-		let endOfMonthMoment = startOfMonthMoment.clone().endOf('month');
-		let statPromise = daySummaryModel.findAll({
-			where: {
-				date: {
-					$lt: endOfMonthMoment.toDate(),
-					$gt: startOfMonthMoment.toDate()
+(function(angular) {
+	'use strict';
+	angular.module('app').factory('monthDataRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+		return {
+			get: function(date) {
+				if (!date) {
+					date = new Date();
 				}
-			}
-		}).then((res) => {
-			return arrayConverter(res);
-		});
 
-		return statPromise;
-	}
-}
+				var dateString = $filter('date')(date, 'yyyy-MM-dd');
+
+				return $http.get(appConfig.backend + 'api/month/' + dateString)
+					.then(function(data) {
+						if (data.data.success) {
+							return data.data.payload;
+						} else {
+							return $q(function(resolve, reject) {
+								reject(data.data.payload);
+							})
+						}
+					});
+			}
+		}
+	}]
+	);
+}(window.angular));

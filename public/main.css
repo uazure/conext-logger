@@ -1,0 +1,37 @@
+.no-padding-x {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+.padding-x-xs {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+.padding-xs {
+	padding: 3px 3px;
+}
+
+.padding-sm {
+	padding: 5px 5px;
+}
+
+.no-border-top {
+	border-top: none;
+}
+
+.no-border-left {
+	border-left: none;
+}
+
+.no-border-right {
+	border-right: none;
+}
+
+.text-overflow {
+	overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+progress {
+	width: 100%;
+}
