@@ -39,7 +39,7 @@
 						"expanded":"Relative yield",
 					},
 					controlOptions: ["Stacked","Expanded"],
-					height: 450,
+					height: 600,
 					margin: {
 						top: 0,
 						right: 75,
