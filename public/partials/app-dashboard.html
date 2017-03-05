@@ -10,19 +10,19 @@
 					</div>
 					<div class="panel-body">
 						<div class="row">
-							<div class="col-xs-2">Power</div>
-							<div class="col-xs-2 padding-x-xs"><strong>{{inverter.ac.power | number: 3}}</strong> kW</div>
-							<div class="col-xs-2 padding-x-xs"><progress max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100}}%</progress></div>
+							<div class="col-xs-4 col-sm-2">Power</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"><strong>{{inverter.ac.power | number: 3}}</strong> kW</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"><progress max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100}}%</progress></div>
 						</div>
 						<div class="row">
-							<div class="col-xs-2">Today</div>
-							<div class="col-xs-2 padding-x-xs">{{inverter.ac.energy | number: 1}} kWh</div>
-							<div class="col-xs-2 padding-x-xs"></div>
+							<div class="col-xs-4 col-sm-2">Today</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs">{{inverter.ac.energy | number: 1}} kWh</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"></div>
 						</div>
 						<div class="row" ng-show="monthStat[inverter.inverterId].startEnergy">
-							<div class="col-xs-2">Month</div>
-							<div class="col-xs-2 padding-x-xs">{{ inverter.ac.totalEnergy - monthStat[inverter.inverterId].startEnergy  | number: 1}} kWh</div>
-							<div class="col-xs-2 padding-x-xs"></div>
+							<div class="col-xs-4 col-sm-2">Month</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs">{{ inverter.ac.totalEnergy - monthStat[inverter.inverterId].startEnergy  | number: 1}} kWh</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"></div>
 						</div>
 					</div>
 				</div>
