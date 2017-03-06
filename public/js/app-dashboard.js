@@ -77,7 +77,7 @@
 				function callUpdate() {
 					return vm.update().then(function() {
 						vm.isReadFailed = false;
-						$timeout(function() {callUpdate();}, 1113000);
+						$timeout(function() {callUpdate();}, 3000);
 					})
 					.catch(function(err) {
 						console.warn('got error', err);
