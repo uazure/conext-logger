@@ -1,6 +1,6 @@
 <div class="container">
 	<div class="row">
-		<div class="col-md-6 col-xs-12 panel panel-default no-padding-x" ng-repeat="inverter in currentMeasurement">
+		<div class="col-sm-6 col-xs-12 panel panel-default no-padding-x" ng-repeat="inverter in currentMeasurement">
 
 			<div class="panel-heading padding-sm">#{{ inverter.inverterId }} {{inverterConfig[inverter.inverterId].name}}</div>
 			<div class="no-padding-x">
@@ -11,8 +11,8 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-xs-4 col-sm-2">Power</div>
-							<div class="col-xs-4 col-sm-2 padding-x-xs"><strong>{{inverter.ac.power | number: 3}}</strong> kW</div>
-							<div class="col-xs-4 col-sm-2 padding-x-xs"><progress max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100}}%</progress></div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"><strong title="Max power {{inverterConfig[inverter.inverterId].power}} kW">{{inverter.ac.power | number: 3}}</strong> kW</div>
+							<div class="col-xs-4 col-sm-2 padding-x-xs"><progress title="{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%" max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%</progress></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4 col-sm-2">Today</div>
@@ -35,13 +35,13 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-xs-4">Power</div>
-							<div class="col-xs-4 padding-x-xs">{{dc.power}} kW</div>
-							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.power * dcConfig.qty / 1000}}" value="{{dc.power}}">{{ dc.power / (dcConfig.power * dcConfig.qty / 1000) * 100}}%</progress></div>
+							<div class="col-xs-4 padding-x-xs" title="Max power: {{ dcConfig.power * dcConfig.qty / 1000 }} kW">{{dc.power}} kW</div>
+							<div class="col-xs-4 padding-x-xs"><progress title="{{ dc.power / (dcConfig.power * dcConfig.qty / 1000) * 100 | number: 1}}%" max="{{ dcConfig.power * dcConfig.qty / 1000}}" value="{{dc.power}}">{{ dc.power / (dcConfig.power * dcConfig.qty / 1000) * 100 | number: 1}}%</progress></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4">Voltage</div>
 							<div class="col-xs-4 padding-x-xs">{{dc.voltage | number : 1}} V</div>
-							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.voltageNominal * dcConfig.qty}}" value="{{dc.voltage}}">{{ dc.voltage / (dcConfig.voltageNominal * dcConfig.qty) * 100}}%</progress></div>
+							<div class="col-xs-4 padding-x-xs"><progress title="{{ dc.voltage / (dcConfig.voltageMax * dcConfig.qty) * 100 | number: 1}}%" max="{{ dcConfig.voltageMax * dcConfig.qty}}" value="{{dc.voltage}}">{{ dc.voltage / (dcConfig.voltageMax * dcConfig.qty) * 100 | number: 1}}%</progress></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4">Current</div>
