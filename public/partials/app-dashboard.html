@@ -1,6 +1,6 @@
 <div class="container">
 	<div class="row">
-		<div class="col-sm-6 col-xs-12 panel panel-default no-padding-x" ng-repeat="inverter in currentMeasurement">
+		<div class="col-md-6 col-xs-12 panel panel-default no-padding-x" ng-repeat="inverter in currentMeasurement">
 
 			<div class="panel-heading padding-sm">#{{ inverter.inverterId }} {{inverterConfig[inverter.inverterId].name}}</div>
 			<div class="no-padding-x">
@@ -27,7 +27,7 @@
 					</div>
 				</div>
 
-				<div class="panel panel-default col-md-6 no-padding-x" ng-repeat="dc in inverter.dc">
+				<div class="panel panel-default col-sm-6 no-padding-x" ng-repeat="dc in inverter.dc">
 					{{ dcConfig = inverterConfig[inverter.inverterId].dc[$index];"" }}
 					<div class="panel-heading padding-xs text-overflow">
 						DC {{$index + 1}} {{ dcConfig.name }}
