@@ -29,7 +29,7 @@ module.exports = {
 		let pos = sunCalc.getPosition(date, coords.lat, coords.lon);
 
 		return {
-			azimuth: ((pos.azimuth - Math.PI) * 180 / Math.PI) % 360,
+			azimuth: ((pos.azimuth + Math.PI) * 180 / Math.PI) % 360,
 			altitude: pos.altitude * 180 / Math.PI
 		};
 	}
