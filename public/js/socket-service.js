@@ -18,35 +18,11 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').component('daySummary', {
-		templateUrl: 'partials/day-summary.html',
-		bindings: {
-			'date': '<'
-		},
-		controller: ['$scope', 'daySummaryRepository', function($scope, daySummaryRepository) {
-			var vm = this;
-			vm.summaryData = {};
+	angular.module('app').factory('socketService', ['appConfig', function(appConfig) {
+		var socket = io(appConfig.backend);
 
-			vm.isLoading = true;
+		return socket;
+	}]
 
-			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
-				update();
-			});
-
-			function update() {
-				vm.isLoading = true;
-				vm.summaryData = {};
-				daySummaryRepository.get(vm.date)
-					.then(function(data) {
-						vm.summaryData = data;
-						vm.isLoading = false;
-						vm.errorMessage = null;
-					})
-					.catch(function(errorMessage) {
-						vm.isLoading = false;
-						vm.errorMessage = errorMessage;
-					});
-			}
-		}]
-	});
-}(angular));
+	);
+}(window.angular));

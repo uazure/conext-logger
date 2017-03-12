@@ -20,27 +20,50 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 // TODO: read .json config instead of requiring js
 var config = require('./config');
-var deviceManager = require('./app/device-manager');
-var measurement = require('./app/measurement-model');
-let measurementRepository = require('./app/measurement-repository');
-let daySummaryRepository = require('./app/day-summary-repository');
+var deviceManager = require('./app/manager/device-manager');
+var measurement = require('./app/model/measurement-model');
+let measurementManager = require('./app/manager/measurement-manager');
+let daySummaryManager = require('./app/manager/day-summary-manager');
+let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
+let sunPositionManager = require('./app/manager/sunPositionManager');
+let monthStatManager = require('./app/manager/month-stat-manager');
 let jsonResponse = require('./app/json-response-factory');
+let pubsub = require('./app/pubsub');
+
 
 app.use(cors());
 app.options('*', cors());
+
+
+io.on('connection', function(){ console.log('Connection!!!'); });
+
+pubsub.on('measurementRecorded', () => {
+	io.emit('new measurement');
+});
+
 
 app.get('/api/state', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
-	deviceManager.readAll().then((data) => {
-		res.json(jsonResponse.success(data));
-	})
-	.catch((err) => {
-		res.status(503).json(jsonResponse.error(err));
-	});
+	let deviceDataPromise = deviceManager.readAll();
+	deviceDataPromise
+		.then((data) => {
+			let sunPosition = sunPositionManager.get();
+			res.json(jsonResponse.success(
+				{
+					sunPosition: sunPosition,
+					data: data
+				}
+			));
+		})
+		.catch((err) => {
+			res.status(503).json(jsonResponse.error(err));
+		});
 });
 
 app.get('/api/day/summary/:date?', function(req, res) {
@@ -48,7 +71,7 @@ app.get('/api/day/summary/:date?', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
-	daySummaryRepository.getDay(req.params.date)
+	daySummaryManager.getDay(req.params.date)
 		.then((data) => {
 			res.json(jsonResponse.success(data));
 		})
@@ -57,12 +80,35 @@ app.get('/api/day/summary/:date?', function(req, res) {
 		});
 });
 
+app.get('/api/month/:date?', function(req, res) {
+	let monthStatPromise = monthStatManager.get(req.params.date);
+	monthStatPromise.then((data) => {
+		res.json(jsonResponse.success(data));
+	});
+});
+
 app.get('/api/day/:date?', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
-	measurementRepository.brief(req.params.date)
+	let measurementsPromise = measurementManager.brief(req.params.date)
+
+	measurementsPromise
+		.then((data) => {
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
+});
+
+app.get('/api/inverter-config/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'cache'
+	});
+
+	inverterConfigManager.getInverterConfig(req.params.date)
 		.then((data) => {
 			res.json(jsonResponse.success(data));
 		})
@@ -74,7 +120,7 @@ app.get('/api/day/:date?', function(req, res) {
 // serve static files from 'public' dir
 app.use(express.static(__dirname + '/public'));
 
-app.listen(config.port, function() {
+server.listen(config.port, function() {
 	console.log('Running on port', config.port);
 	console.log('Launching scheduler');
 	require('./schedule')();

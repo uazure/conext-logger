@@ -18,35 +18,27 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').component('daySummary', {
-		templateUrl: 'partials/day-summary.html',
-		bindings: {
-			'date': '<'
-		},
-		controller: ['$scope', 'daySummaryRepository', function($scope, daySummaryRepository) {
-			var vm = this;
-			vm.summaryData = {};
+	angular.module('app').factory('monthDataRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+		return {
+			get: function(date) {
+				if (!date) {
+					date = new Date();
+				}
 
-			vm.isLoading = true;
+				var dateString = $filter('date')(date, 'yyyy-MM-dd');
 
-			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
-				update();
-			});
-
-			function update() {
-				vm.isLoading = true;
-				vm.summaryData = {};
-				daySummaryRepository.get(vm.date)
+				return $http.get(appConfig.backend + 'api/month/' + dateString)
 					.then(function(data) {
-						vm.summaryData = data;
-						vm.isLoading = false;
-						vm.errorMessage = null;
-					})
-					.catch(function(errorMessage) {
-						vm.isLoading = false;
-						vm.errorMessage = errorMessage;
+						if (data.data.success) {
+							return data.data.payload;
+						} else {
+							return $q(function(resolve, reject) {
+								reject(data.data.payload);
+							})
+						}
 					});
 			}
-		}]
-	});
-}(angular));
+		}
+	}]
+	);
+}(window.angular));

@@ -23,15 +23,26 @@ and returns promise which is resolved with array of inverters data
 
 'use strict';
 
-let daySummaryModel = require('./day-summary-model');
-let arrayConverter = require('./day-summary-model-array-converter');
+let daySummaryModel = require('../model/day-summary-model');
+let arrayConverter = require('../day-summary-model-array-converter');
+let measurementManager = require('./measurement-manager');
+let daySummaryProcessor = require('../day-summary-processor');
 let moment = require('moment');
 
 module.exports = {};
 
 module.exports.getDay = function(dateString) {
+	let date = moment(dateString).toDate();
 	return getData(dateString).then((data) => {
-		return arrayConverter(data);
+		if (data && data.length) {
+			return arrayConverter(data);
+		}
+
+		return measurementManager.full(date)
+			.then((data) => {
+				let models = daySummaryProcessor(date, data);
+				return arrayConverter(models);
+			});
 	});
 
 	function getData(dateString) {

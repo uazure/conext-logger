@@ -23,11 +23,15 @@
 		bindings: {
 			'date': '<'
 		},
-		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', function($scope, dayMeasurementRepository, dayMeasurementAdapter) {
+		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', 'socketService', function($scope, dayMeasurementRepository, dayMeasurementAdapter, socketService) {
 			var vm = this;
+			socketService.on('new measurement', function() {
+				update();
+			});
 
 			vm.config = {refreshDataOnly: false};
-			vm.isLoading = true;
+			vm.isReady = false;
+			vm.isLoading = false;
 
 			vm.options = {
 				chart: {
@@ -38,7 +42,7 @@
 						"expanded":"Relative yield",
 					},
 					controlOptions: ["Stacked","Expanded"],
-					height: 450,
+					height: 600,
 					margin: {
 						top: 0,
 						right: 75,
@@ -90,9 +94,13 @@
 			});
 
 			function update() {
+				if (vm.isLoading) {
+					return;
+				}
 				vm.isLoading = true;
 				dayMeasurementRepository.get(vm.date)
-					.then(function(data) {
+					.then(function(repositoryData) {
+						var data = repositoryData;
 						var meaningfulData = angular.copy(data);
 
 						data.forEach(function(inverterData, index) {
@@ -117,6 +125,7 @@
 						vm.options.chart.yDomain = [0, Math.max(1, max)];
 
 						vm.isLoading = false;
+						vm.isReady = true;
 					});
 			}
 

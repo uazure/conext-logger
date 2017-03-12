@@ -27,6 +27,7 @@ module.exports = function(dataArray) {
 		var value = {
 			date: moment(item.date).format('YYYY-MM-DD'),
 			energy: item.energy,
+			totalEnergy: item.total_energy,
 			powerMax: item.power_max,
 			dc1PowerMax: item.dc1_power_max,
 			dc1Energy: item.dc1_energy,

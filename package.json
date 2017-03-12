@@ -15,6 +15,10 @@
   ],
   "author": "Sergii Popov",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uazure/conext-logger.git"
+  },
   "dependencies": {
     "angular": "^1.5.8",
     "angular-nvd3": "^1.0.9",
@@ -34,6 +38,9 @@
     "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.24.5",
+    "socket.io": "^1.7.3",
+    "socket.io-client": "^1.7.3",
+    "suncalc": "^1.8.0",
     "uuid": "^3.0.1"
   }
 }

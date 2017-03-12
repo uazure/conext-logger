@@ -18,9 +18,9 @@
 
 'use strict';
 
-let config = require('../config');
+let config = require('../../config');
 let Sequelize = require('sequelize');
-let logger = require('./logger');
+let logger = require('../logger');
 
 let sequelize = new Sequelize(config.db.connectionString, {
 	logging: logger.log

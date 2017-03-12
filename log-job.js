@@ -19,8 +19,8 @@
 'use strict';
 let uuid = require('uuid');
 let config = require('./config');
-var deviceManager = require('./app/device-manager');
-var measurement = require('./app/measurement-model');
+var deviceManager = require('./app/manager/device-manager');
+var measurement = require('./app/model/measurement-model');
 var logger = require('./app/logger');
 var moment = require('moment');
 var pubsub = require('./app/pubsub');
@@ -105,6 +105,7 @@ module.exports = function() {
 					measurement.create(ConextModelConverter(res))
 						.then(() => {
 							logger.log('logged ok');
+							pubsub.emit('measurementRecorded');
 						});
 				});
 			} else {
