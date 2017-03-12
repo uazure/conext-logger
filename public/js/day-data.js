@@ -23,8 +23,11 @@
 		bindings: {
 			'date': '<'
 		},
-		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', function($scope, dayMeasurementRepository, dayMeasurementAdapter) {
+		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', 'socketService', function($scope, dayMeasurementRepository, dayMeasurementAdapter, socketService) {
 			var vm = this;
+			socketService.on('new measurement', function() {
+				update();
+			});
 
 			vm.config = {refreshDataOnly: false};
 			vm.isReady = false;

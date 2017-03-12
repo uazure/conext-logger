@@ -20,15 +20,8 @@
 	'use strict';
 	angular.module('app').factory('socketService', ['appConfig', function(appConfig) {
 		var socket = io(appConfig.backend);
-		socket.on('new measurement', function(data) {
-			console.log('new measurement!', data);
-		});
 
-		return {
-			disconnect: function() {
-				socket.close();
-			}
-		};
+		return socket;
 	}]
 
 	);

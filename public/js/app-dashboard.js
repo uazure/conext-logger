@@ -21,8 +21,8 @@
 	angular.module('app').component('appDashboard',
 		{
 			templateUrl: 'partials/app-dashboard.html',
-			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository', 'socketService',
-			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository, socketService) {
+			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository',
+			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository) {
 				var vm = $scope;
 				var timer;
 
