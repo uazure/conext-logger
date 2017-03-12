@@ -105,6 +105,7 @@ module.exports = function() {
 					measurement.create(ConextModelConverter(res))
 						.then(() => {
 							logger.log('logged ok');
+							pubsub.emit('measurementRecorded');
 						});
 				});
 			} else {

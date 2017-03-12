@@ -20,6 +20,8 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 // TODO: read .json config instead of requiring js
 var config = require('./config');
 var deviceManager = require('./app/manager/device-manager');
@@ -30,9 +32,19 @@ let inverterConfigManager = require('./app/manager/inverter-configuration-manage
 let sunPositionManager = require('./app/manager/sunPositionManager');
 let monthStatManager = require('./app/manager/month-stat-manager');
 let jsonResponse = require('./app/json-response-factory');
+let pubsub = require('./app/pubsub');
+
 
 app.use(cors());
 app.options('*', cors());
+
+
+io.on('connection', function(){ console.log('Connection!!!'); });
+
+pubsub.on('measurementRecorded', () => {
+	io.emit('new measurement');
+});
+
 
 app.get('/api/state', function(req, res) {
 	res.set({
@@ -108,7 +120,7 @@ app.get('/api/inverter-config/:date?', function(req, res) {
 // serve static files from 'public' dir
 app.use(express.static(__dirname + '/public'));
 
-app.listen(config.port, function() {
+server.listen(config.port, function() {
 	console.log('Running on port', config.port);
 	console.log('Launching scheduler');
 	require('./schedule')();
