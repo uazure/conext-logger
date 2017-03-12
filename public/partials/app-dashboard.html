@@ -48,9 +48,18 @@
 							<div class="col-xs-4 padding-x-xs">{{dc.current | number : 2}} A</div>
 							<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.currentNominal}}" value="{{dc.current}}">{{ dc.current / (dcConfig.currentNominal * dcConfig.qty) * 100}}%</progress></div>
 						</div>
+						<div class="row" ng-if="dc.powerFactor">
+							<div class="col-xs-4" title="Takes into account sun position and panel orientation to calculate panel efficiency">Efficiency</div>
+							<div class="col-xs-4 padding-x-xs" title="Power factor based on panel orientation and sun position only">{{ dc.powerFactor * 100 | number: 1}} %</div>
+							<div class="col-xs-4 padding-x-xs" title="Relation of current power with respect to power factor to panel STC characteristics">{{(dc.power / dc.powerFactor) / (dcConfig.power * dcConfig.qty / 1000) * 100| number : 1}} %</div>
+						</div>
 					</div>
 				</div>
 
+				<div class="small">
+					Sun altitude: {{ sunPosition.altitude | number: 1 }} deg, optimal tilt: {{ 90 - sunPosition.altitude | number: 1}}<br/>
+					Sun azimuth: {{ sunPosition.azimuth | number: 1}} deg, {{ 180 - sunPosition.azimuth | number: 1}} deg from south
+				</div>
 			</div>
 
 		</div>

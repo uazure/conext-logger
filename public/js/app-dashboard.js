@@ -64,8 +64,21 @@
 				vm.update = function() {
 					return currentMeasurementRepository.get()
 						.then(function(result) {
+							vm.sunPosition = result.sunPosition;
 							vm.currentMeasurement = result.data;
 							vm.date = new Date(vm.currentMeasurement[0].createdAt);
+
+							/* calculate power factor based on azimuth/altitude for each dc
+							if inverterConfig is present */
+							if (vm.inverterConfig) {
+								vm.currentMeasurement.forEach(function(inverter) {
+									inverter.dc.forEach(function(dc, index) {
+										var dcConfig = vm.inverterConfig[inverter.inverterId].dc[index];
+										dc.powerFactor = Math.cos((vm.sunPosition.azimuth - dcConfig.azimuth) / 180 * Math.PI)
+											* Math.cos((90 - dcConfig.tilt - vm.sunPosition.altitude) / 180 * Math.PI);
+									});
+								})
+							}
 						});
 				}
 
