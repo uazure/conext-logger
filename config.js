@@ -3,6 +3,10 @@ module.exports = {
 	db: {
 		connectionString: 'postgres://solar:solar@localhost:5432/solar'
 	},
+	cooridnates: {
+		lat: 49.966327,
+		lon: 36.346082
+	},
 	inverters: [
 		// {
 		// 	id: 1,
@@ -18,8 +22,8 @@ module.exports = {
 			module: 'conext-rl-module',
 			name: 'Conext RL 4000ES',
 			inputs: [
-				{name: 'dc1', panelVendor: 'GPPV', panelPower: 310, panelQty: 6},
-				{name: 'dc2', panelVendor: 'Yabang Solar / AbiSolar', panelPower: 250, panelQty: 12}
+				{name: 'dc1'},
+				{name: 'dc2'}
 			]
 		}
 	],
@@ -27,5 +31,6 @@ module.exports = {
 		'dc1': 0,
 		'dc2': 1
 	},
-	verbosity: 1, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
+
+	verbosity: 4, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
 };

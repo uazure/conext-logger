@@ -17,7 +17,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-	"url": "https://github.com/uazure/conext-logger.git"
+    "url": "https://github.com/uazure/conext-logger.git"
   },
   "dependencies": {
     "angular": "^1.5.8",
@@ -38,6 +38,7 @@
     "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.24.5",
+    "suncalc": "^1.8.0",
     "uuid": "^3.0.1"
   }
 }

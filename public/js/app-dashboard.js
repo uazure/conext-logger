@@ -64,8 +64,8 @@
 				vm.update = function() {
 					return currentMeasurementRepository.get()
 						.then(function(result) {
-							vm.currentMeasurement = result;
-							vm.date = new Date(result[0].createdAt);
+							vm.currentMeasurement = result.data;
+							vm.date = new Date(vm.currentMeasurement[0].createdAt);
 						});
 				}
 

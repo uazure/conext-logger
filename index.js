@@ -27,6 +27,7 @@ var measurement = require('./app/model/measurement-model');
 let measurementRepository = require('./app/measurement-repository');
 let daySummaryRepository = require('./app/day-summary-repository');
 let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
+let sunPositionManager = require('./app/manager/sunPositionManager');
 let monthStatManager = require('./app/manager/month-stat-manager');
 let jsonResponse = require('./app/json-response-factory');
 
@@ -40,7 +41,13 @@ app.get('/api/state', function(req, res) {
 	let deviceDataPromise = deviceManager.readAll();
 	deviceDataPromise
 		.then((data) => {
-			res.json(jsonResponse.success(data));
+			let sunPosition = sunPositionManager.get();
+			res.json(jsonResponse.success(
+				{
+					sunPosition: sunPosition,
+					data: data
+				}
+			));
 		})
 		.catch((err) => {
 			res.status(503).json(jsonResponse.error(err));
