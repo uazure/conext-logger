@@ -40,6 +40,7 @@
 					.then(function(data) {
 						vm.summaryData = data;
 						vm.isLoading = false;
+						vm.errorMessage = null;
 					})
 					.catch(function(errorMessage) {
 						vm.isLoading = false;

@@ -23,12 +23,6 @@ let uuid = require('uuid');
 let MEASUREMENT_INTERVAL_THRESHOLD = 90000; // 90 seconds to catch measurements that are made within 1 minute
 let DEFAULT_DURATION = 60000;
 
-/**
-	function to process measurements data got by measurementRepository.full()
-	returns array with models ready to be inserted to db;
-
-*/
-
 // accepts array of arrays where first value is date and second is power
 function calculateTotalEnergy(values) {
 	var energy = values.reduce((value, item, index, array) => {
@@ -49,6 +43,11 @@ function calculateTotalEnergy(values) {
 	return energy
 }
 
+/**
+	function to process measurements data got by measurementRepository.full()
+	returns array with models ready to be inserted to db;
+
+*/
 module.exports = function(targetDate, data) {
 	var response = [];
 

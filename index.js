@@ -24,8 +24,8 @@ var cors = require('cors');
 var config = require('./config');
 var deviceManager = require('./app/manager/device-manager');
 var measurement = require('./app/model/measurement-model');
-let measurementRepository = require('./app/measurement-repository');
-let daySummaryRepository = require('./app/day-summary-repository');
+let measurementManager = require('./app/manager/measurement-manager');
+let daySummaryManager = require('./app/manager/day-summary-manager');
 let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
 let sunPositionManager = require('./app/manager/sunPositionManager');
 let monthStatManager = require('./app/manager/month-stat-manager');
@@ -59,7 +59,7 @@ app.get('/api/day/summary/:date?', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
-	daySummaryRepository.getDay(req.params.date)
+	daySummaryManager.getDay(req.params.date)
 		.then((data) => {
 			res.json(jsonResponse.success(data));
 		})
@@ -80,7 +80,7 @@ app.get('/api/day/:date?', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
-	let measurementsPromise = measurementRepository.brief(req.params.date)
+	let measurementsPromise = measurementManager.brief(req.params.date)
 
 	measurementsPromise
 		.then((data) => {

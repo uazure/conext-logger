@@ -23,8 +23,8 @@ and returns promise which is resolved with array of inverters data
 
 'use strict';
 
-let measurement = require('./model/measurement-model');
-let measurementArrayConverter = require('./measurement-model-array-converter');
+let measurement = require('../model/measurement-model');
+let measurementArrayConverter = require('../measurement-model-array-converter');
 let moment = require('moment');
 
 module.exports = {};

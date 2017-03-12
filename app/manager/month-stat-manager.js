@@ -18,12 +18,9 @@
 
 'use strict';
 
-let measurement = require('../model/measurement-model');
 let daySummaryModel = require('../model/day-summary-model');
 let arrayConverter = require('../day-summary-model-array-converter');
-let sequelize = require('sequelize');
 let moment = require('moment');
-let logger = require('../logger');
 
 module.exports = {
 	get: function(dateString) {
