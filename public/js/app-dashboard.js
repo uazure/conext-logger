@@ -24,6 +24,7 @@
 			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository',
 			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository) {
 				var vm = $scope;
+				var timer;
 
 				vm.date = new Date();
 				vm.isReadFailed = false;
@@ -90,16 +91,20 @@
 				function callUpdate() {
 					return vm.update().then(function() {
 						vm.isReadFailed = false;
-						$timeout(function() {callUpdate();}, 3000);
+						timer = $timeout(function() {callUpdate();}, 3000);
 					})
 					.catch(function(err) {
 						console.warn('got error', err);
 						vm.isReadFailed = true;
-						$timeout(function() {callUpdate();}, 5000);
+						timer = $timeout(function() {callUpdate();}, 5000);
 					})
 				};
 
 				callUpdate();
+
+				$scope.$on('$destroy', function() {
+					$timeout.cancel(timer);
+				});
 
 			}]
 		});
