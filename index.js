@@ -92,7 +92,7 @@ app.get('/api/day/:date?', function(req, res) {
 		'Cache-control': 'no-cache, no-store, must-revalidate'
 	});
 
-	let measurementsPromise = measurementManager.brief(req.params.date)
+	let measurementsPromise = measurementManager.full(req.params.date)
 
 	measurementsPromise
 		.then((data) => {

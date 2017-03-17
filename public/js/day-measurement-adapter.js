@@ -54,7 +54,7 @@
 							}
 
 							var row = getRowObject(inverter.inverterId, key);
-							row.values.push([new Date(value.createdAt), value[key]]);
+							row.values.push({x: new Date(value.createdAt), y: value[key]});
 						}
 
 					})

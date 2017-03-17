@@ -1,0 +1,1 @@
+../node_modules/angular-chart.js/dist/
