@@ -1,9 +1,9 @@
-<div class="text-center" ng-show="$ctrl.isLoading">
+<div class="text-center" ng-hide="$ctrl.isReady">
 	<h2>Loading...</h2>
 </div>
 
 <div>
-	<canvas ng-hide="ctrl.isLoading" id="line" class="chart chart-line" chart-data="$ctrl.data" chart-series="$ctrl.series" chart-options="$ctrl.options"  chart-dataset-override="$ctrl.datasetOverride">
+	<canvas ng-show="$ctrl.isReady" id="line" class="chart chart-line" chart-data="$ctrl.data" chart-series="$ctrl.series" chart-options="$ctrl.options"  chart-dataset-override="$ctrl.datasetOverride">
 		Canvas is not supported
 	</canvas>
 </div>
