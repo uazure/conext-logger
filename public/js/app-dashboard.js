@@ -21,8 +21,8 @@
 	angular.module('app').component('appDashboard',
 		{
 			templateUrl: 'partials/app-dashboard.html',
-			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository',
-			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository) {
+			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository', 'sunPositionService',
+			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository, sunPositionService) {
 				var vm = $scope;
 				var timer;
 
@@ -65,7 +65,7 @@
 				vm.update = function() {
 					return currentMeasurementRepository.get()
 						.then(function(result) {
-							vm.sunPosition = result.sunPosition;
+							vm.sunPosition = sunPositionService.get();
 							vm.currentMeasurement = result.data;
 							vm.date = new Date(vm.currentMeasurement[0].createdAt);
 
@@ -74,9 +74,13 @@
 							if (vm.inverterConfig) {
 								vm.currentMeasurement.forEach(function(inverter) {
 									inverter.dc.forEach(function(dc, index) {
+										if (!vm.inverterConfig[inverter.inverterId]) {
+											return;
+										}
+
 										var dcConfig = vm.inverterConfig[inverter.inverterId].dc[index];
-										dc.powerFactor = Math.cos((vm.sunPosition.azimuth - dcConfig.azimuth) / 180 * Math.PI)
-											* Math.cos((90 - dcConfig.tilt - vm.sunPosition.altitude) / 180 * Math.PI);
+										var powerFactor = sunPositionService.getPowerFactor(dcConfig, vm.sunPosition);
+										Object.assign(dc, powerFactor);
 									});
 								})
 							}

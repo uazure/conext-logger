@@ -1,15 +1,16 @@
 (function(angular){
 	'use strict';
 
-	// uncomment this in prod
-	// angular.module('app.config', []).constant('appConfig', {
-	// 	backend: 'http://192.168.16.216:8000/'
-	// });
-
-	//comment this out to use dev config
-	//
 	angular.module('app.config', []).constant('appConfig', {
 		backend: '/'
 	});
 
+	angular.module('app.config').run(['$http', 'appConfig', function($http, appConfig) {
+		$http.get(appConfig.backend + 'api/runtime-config').then(function(res) {
+			if (res.data.success) {
+				Object.assign(appConfig, res.data.payload)
+			}
+		});
+	}]
+	);
 }(angular));

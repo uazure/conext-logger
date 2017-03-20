@@ -29,7 +29,6 @@ var measurement = require('./app/model/measurement-model');
 let measurementManager = require('./app/manager/measurement-manager');
 let daySummaryManager = require('./app/manager/day-summary-manager');
 let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
-let sunPositionManager = require('./app/manager/sunPositionManager');
 let monthStatManager = require('./app/manager/month-stat-manager');
 let jsonResponse = require('./app/json-response-factory');
 let pubsub = require('./app/pubsub');
@@ -53,10 +52,8 @@ app.get('/api/state', function(req, res) {
 	let deviceDataPromise = deviceManager.readAll();
 	deviceDataPromise
 		.then((data) => {
-			let sunPosition = sunPositionManager.get();
 			res.json(jsonResponse.success(
 				{
-					sunPosition: sunPosition,
 					data: data
 				}
 			));
@@ -115,6 +112,17 @@ app.get('/api/inverter-config/:date?', function(req, res) {
 		.catch(() => {
 			res.status(503).json(jsonResponse.error('Failed to get data'));
 		});
+});
+
+app.get('/api/runtime-config', function(req, res) {
+	res.set({
+		'Cache-control': 'cache'
+	});
+
+	let coordinates = inverterConfigManager.getCoordinates();
+	res.json(jsonResponse.success({
+		coordinates: coordinates
+	}));
 });
 
 // serve static files from 'public' dir
