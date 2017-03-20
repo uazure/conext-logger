@@ -1,5 +1,25 @@
 <div class="container">
 	<div class="row">
+		<div class="col-xs-2">
+			Power
+		</div>
+		<div class="col-xs-2">
+			<strong>{{ currentMeasurementSummary.power }} kW</strong>
+		</div>
+		<div class="col-xs-2">
+			Energy
+		</div>
+		<div class="col-xs-2">
+			<strong>{{ currentMeasurementSummary.energy }} kWh</strong>
+		</div>
+		<div class="col-xs-2">
+			Month
+		</div>
+		<div class="col-xs-2">
+			<strong>{{ currentMeasurementSummary.month }} kWh</strong>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-md-6 col-xs-12" ng-repeat="inverter in currentMeasurement">
 			<div class="panel panel-default no-padding-x">
 				<div class="panel-heading padding-sm">#{{ inverter.inverterId }} {{inverterConfig[inverter.inverterId].name}}</div>

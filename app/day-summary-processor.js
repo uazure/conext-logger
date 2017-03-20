@@ -69,9 +69,14 @@ module.exports = function(targetDate, data) {
 		let dc1Energy = calculateTotalEnergy(inverter.values.map((value) => {return [value.createdAt, value.dc1Power]}));
 		let dc2Energy = calculateTotalEnergy(inverter.values.map((value) => {return [value.createdAt, value.dc2Power]}));
 		let dcEnergy = dc1Energy + dc2Energy;
+		if (dcEnergy > 0) {
+			model.dc1_energy = Number((model.energy * dc1Energy / dcEnergy).toFixed(3));
+			model.dc2_energy = Number((model.energy * dc2Energy / dcEnergy).toFixed(3));
+		} else {
+			model.dc1_energy = 0;
+			model.dc2_energy = 0;
+		}
 
-		model.dc1_energy = Number((model.energy * dc1Energy / dcEnergy).toFixed(3));
-		model.dc2_energy = Number((model.energy * dc2Energy / dcEnergy).toFixed(3));
 		model.energy = Number(model.energy.toFixed(3));
 
 		response.push(model);

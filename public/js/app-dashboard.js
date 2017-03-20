@@ -25,12 +25,19 @@
 			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository, sunPositionService) {
 				var vm = $scope;
 				var timer;
+				var currentMeasurementSummary = {
+					power: 0,
+					energy: 0,
+					monthEnergy: 0
+				};
 
 				vm.date = new Date();
 				vm.isReadFailed = false;
-				vm.currentMeasurement = {};
+				vm.currentMeasurement = [];
+				vm.currentMeasurementSummary = currentMeasurementSummary;
 				vm.monthData = [];
 				vm.inverterConfig = {};
+				vm.viewState = {};
 
 				vm.updateMonthSummary = function() {
 					monthDataRepository.get()
@@ -67,12 +74,28 @@
 						.then(function(result) {
 							vm.sunPosition = sunPositionService.get();
 							vm.currentMeasurement = result.data;
+							vm.currentMeasurementSummary = Object.assign({}, currentMeasurementSummary);
+
 							vm.date = new Date(vm.currentMeasurement[0].createdAt);
+
+							/* update summary */
+							vm.currentMeasurement.forEach(function (inverter) {
+								vm.currentMeasurementSummary.power += inverter.ac.power;
+								vm.currentMeasurementSummary.energy += inverter.ac.energy;
+								if (vm.monthStat) {
+									/* update summary with month stat */
+									vm.currentMeasurementSummary.monthEnergy += inverter.ac.totalEnergy - vm.monthStat
+								}
+
+							});
 
 							/* calculate power factor based on azimuth/altitude for each dc
 							if inverterConfig is present */
 							if (vm.inverterConfig) {
 								vm.currentMeasurement.forEach(function(inverter) {
+
+
+
 									inverter.dc.forEach(function(dc, index) {
 										if (!vm.inverterConfig[inverter.inverterId]) {
 											return;

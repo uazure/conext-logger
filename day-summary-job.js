@@ -40,7 +40,7 @@ module.exports = function(targetDate) {
 		if (res > 0) {
 			logger.log('There are records for date', date, 'will not recalculate');
 		} else {
-			return measurementRepository.full(date)
+			return measurementManager.full(date)
 				.then((data) => {
 					var models = daySummaryProcessor(date, data);
 					models.forEach((model) => {
