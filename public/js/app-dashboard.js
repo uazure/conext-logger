@@ -28,7 +28,8 @@
 				var currentMeasurementSummary = {
 					power: 0,
 					energy: 0,
-					monthEnergy: 0
+					monthEnergy: 0,
+					totalEnergy: 0
 				};
 
 				vm.date = new Date();
@@ -37,7 +38,11 @@
 				vm.currentMeasurementSummary = currentMeasurementSummary;
 				vm.monthData = [];
 				vm.inverterConfig = {};
-				vm.viewState = {};
+				vm.showDetails = false;
+
+				vm.showDetailsToggle = function() {
+					vm.showDetails = !vm.showDetails;
+				};
 
 				vm.updateMonthSummary = function() {
 					monthDataRepository.get()
@@ -82,9 +87,10 @@
 							vm.currentMeasurement.forEach(function (inverter) {
 								vm.currentMeasurementSummary.power += inverter.ac.power;
 								vm.currentMeasurementSummary.energy += inverter.ac.energy;
-								if (vm.monthStat) {
+								vm.currentMeasurementSummary.totalEnergy += inverter.ac.totalEnergy;
+								if (vm.monthStat && vm.monthStat[inverter.inverterId]) {
 									/* update summary with month stat */
-									vm.currentMeasurementSummary.monthEnergy += inverter.ac.totalEnergy - vm.monthStat
+									vm.currentMeasurementSummary.monthEnergy += inverter.ac.totalEnergy - vm.monthStat[inverter.inverterId].startEnergy;
 								}
 
 							});
@@ -93,9 +99,6 @@
 							if inverterConfig is present */
 							if (vm.inverterConfig) {
 								vm.currentMeasurement.forEach(function(inverter) {
-
-
-
 									inverter.dc.forEach(function(dc, index) {
 										if (!vm.inverterConfig[inverter.inverterId]) {
 											return;

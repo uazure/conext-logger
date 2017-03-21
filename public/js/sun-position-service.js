@@ -37,7 +37,7 @@
 				var pos = SunCalc.getPosition(date, coords.lat, coords.lon);
 
 				return {
-					azimuth: ((pos.azimuth * 180 / Math.PI) - 180) % 360,
+					azimuth: ((pos.azimuth * 180 / Math.PI) + 180) % 360,
 					altitude: pos.altitude * 180 / Math.PI
 				};
 			},

@@ -1,5 +1,5 @@
 <div class="container">
-	<div class="row">
+	<div class="row" ng-click="showDetailsToggle()">
 		<div class="col-xs-2">
 			Power
 		</div>
@@ -7,7 +7,7 @@
 			<strong>{{ currentMeasurementSummary.power }} kW</strong>
 		</div>
 		<div class="col-xs-2">
-			Energy
+			Today
 		</div>
 		<div class="col-xs-2">
 			<strong>{{ currentMeasurementSummary.energy }} kWh</strong>
@@ -16,7 +16,13 @@
 			Month
 		</div>
 		<div class="col-xs-2">
-			<strong>{{ currentMeasurementSummary.month }} kWh</strong>
+			<strong>{{ currentMeasurementSummary.monthEnergy | number : 1}} kWh</strong>
+		</div>
+		<div class="col-xs-2" ng-show="showDetails">
+			<strong>Total</strong>
+		</div>
+		<div class="col-xs-2" ng-show="showDetails">
+			<strong>{{ currentMeasurementSummary.totalEnergy | number: 0 }} kWh</strong>
 		</div>
 	</div>
 	<div class="row">
@@ -30,19 +36,24 @@
 						</div>
 						<div class="panel-body">
 							<div class="row">
-								<div class="col-xs-4 col-sm-2">Power</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs"><strong title="Max power {{inverterConfig[inverter.inverterId].power}} kW">{{inverter.ac.power | number: 3}}</strong> kW</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs"><progress title="{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%" max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%</progress></div>
+								<div class="col-xs-4 ">Power</div>
+								<div class="col-xs-4 padding-x-xs"><strong title="Max power {{inverterConfig[inverter.inverterId].power}} kW">{{inverter.ac.power | number: 3}}</strong> kW</div>
+								<div class="col-xs-4 padding-x-xs"><progress title="{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%" max="{{ inverterConfig[inverter.inverterId].power }}" value="{{ inverter.ac.power }}">{{ inverter.ac.power / inverterConfig[inverter.inverterId].power * 100 | number: 1}}%</progress></div>
 							</div>
 							<div class="row">
-								<div class="col-xs-4 col-sm-2">Today</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs">{{inverter.ac.energy | number: 1}} kWh</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs"></div>
+								<div class="col-xs-4 ">Today</div>
+								<div class="col-xs-4 padding-x-xs">{{inverter.ac.energy | number: 1}} kWh</div>
+								<div class="col-xs-4 padding-x-xs"></div>
 							</div>
 							<div class="row" ng-show="monthStat[inverter.inverterId].startEnergy">
-								<div class="col-xs-4 col-sm-2">Month</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs">{{ inverter.ac.totalEnergy - monthStat[inverter.inverterId].startEnergy  | number: 1}} kWh</div>
-								<div class="col-xs-4 col-sm-2 padding-x-xs"></div>
+								<div class="col-xs-4 ">Month</div>
+								<div class="col-xs-4 padding-x-xs">{{ inverter.ac.totalEnergy - monthStat[inverter.inverterId].startEnergy  | number: 1}} kWh</div>
+								<div class="col-xs-4 padding-x-xs"></div>
+							</div>
+							<div class="row" ng-show="showDetails">
+								<div class="col-xs-4 ">Total</div>
+								<div class="col-xs-4 padding-x-xs">{{ inverter.ac.totalEnergy | number: 0}} kWh</div>
+								<div class="col-xs-4 padding-x-xs"></div>
 							</div>
 						</div>
 					</div>
@@ -68,10 +79,32 @@
 								<div class="col-xs-4 padding-x-xs">{{dc.current | number : 2}} A</div>
 								<div class="col-xs-4 padding-x-xs"><progress max="{{ dcConfig.currentNominal}}" value="{{dc.current}}">{{ dc.current / (dcConfig.currentNominal * dcConfig.qty) * 100}}%</progress></div>
 							</div>
-							<div class="row">
-								<div class="col-xs-4" title="Takes into account sun position and panel orientation to calculate panel efficiency">Efficiency</div>
-								<div class="col-xs-4 padding-x-xs" title="Power factor based on panel orientation and sun position only">{{ dc.powerFactor * 100 | number: 1}} %</div>
-								<div class="col-xs-4 padding-x-xs" ng-if="dc.powerFactor > 0" title="Relation of current power with respect to power factor to panel STC characteristics">{{(dc.power / dc.powerFactor) / (dcConfig.power * dcConfig.qty / 1000) * 100| number : 1}} %</div>
+							<div ng-show="showDetails">
+								<div class="row">
+									<div class="col-xs-4">Name</div>
+									<div class="col-xs-8 padding-x-xs">{{ dcConfig.name }}</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">Quantity</div>
+									<div class="col-xs-8 padding-x-xs">{{ dcConfig.qty }} * {{ dcConfig.power }} W</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">Max</div>
+									<div class="col-xs-8 padding-x-xs">{{ dcConfig.qty * dcConfig.power / 1000 | number: 2}} kW</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">Horizontal</div>
+									<div class="col-xs-4 padding-x-xs">{{ dcConfig.azimuth - sunPosition.azimuth | number: 1}} &deg;</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4">Vertical</div>
+									<div class="col-xs-4 padding-x-xs">{{ 90 - dcConfig.tilt - sunPosition.altitude | number: 1}} &deg;</div>
+								</div>
+								<div class="row" ng-if="dcConfig.power">
+									<div class="col-xs-4" title="Takes into account sun position and panel orientation to calculate panel efficiency">Efficiency</div>
+									<div class="col-xs-4 padding-x-xs" title="Power factor based on panel orientation and sun position only">{{ dc.powerFactor * 100 | number: 1}} %</div>
+									<div class="col-xs-4 padding-x-xs" ng-if="dc.powerFactor > 0" title="Relation of current power with respect to power factor to panel STC characteristics">{{(dc.power / dc.powerFactor) / (dcConfig.power * dcConfig.qty / 1000) * 100| number : 1}} %</div>
+								</div>
 							</div>
 						</div>
 					</div>
