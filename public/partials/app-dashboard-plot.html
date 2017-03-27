@@ -1,0 +1,10 @@
+<h3>Power chart</h3>
+{{ $ctrl.mode }}
+<div ng-show="$ctrl.mode == 'date'">
+	<button class="btn btn-default btn-xs" ng-click="$ctrl.onModeChange('month')">Month</button>
+	<day-data></day-data>
+</div>
+<div ng-show="$ctrl.mode == 'month'">
+	<button class="btn btn-default btn-xs" ng-click="$ctrl.onModeChange('date')">Day</button>
+	<month-data></month-data>
+</div>

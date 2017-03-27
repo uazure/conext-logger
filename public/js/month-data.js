@@ -18,12 +18,12 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').component('dayData', {
-		templateUrl: 'partials/day-data.html',
+	angular.module('app').component('monthData', {
+		templateUrl: 'partials/month-data.html',
 		bindings: {
 			'date': '<'
 		},
-		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', 'socketService', function($scope, dayMeasurementRepository, dayMeasurementAdapter, socketService) {
+		controller: ['$scope', 'monthDataRepository', function($scope, monthDataRepository) {
 			var vm = this;
 			var seriesOptions = {
 				pointRadius: 0,
@@ -32,23 +32,23 @@
 				lineTension: 0
 			};
 
-			socketService.on('new measurement', function() {
-				update();
-			});
-
 			vm.isReady = false;
 			vm.isLoading = false;
 
 			vm.series = [];
 			vm.data = [];
+			vm.labels = [];
+			vm.onClick = function(ev) {
+				console.log("Clicked", ev);
+			};
 			vm.options = {
 				scales: {
 					xAxes: [{
 						type: 'time',
 						time: {
-							unit: 'hour',
+							unit: 'day',
 							displayFormats: {
-								hour: 'HH'
+								day: 'DD'
 							}
 						},
 						position: 'bottom'
@@ -68,7 +68,9 @@
 			update();
 
 			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
-				update();
+				if (newValue != oldValue) {
+					update();
+				}
 			});
 
 			function update() {
@@ -76,40 +78,54 @@
 					return;
 				}
 				vm.isLoading = true;
-				dayMeasurementRepository.get(vm.date)
+				monthDataRepository.get(vm.date)
 					.then(function(repositoryData) {
-						vm.options.title.text = (vm.date || new Date()).toDateString();
+						var currentMonth = vm.date ? new Date(vm.date) : new Date();
 						var data = repositoryData;
-						var meaningfulData = angular.copy(data);
+						var labels = [];
 
-						data.forEach(function(inverterData, index) {
-							var isLastMeaningful = false;
-							meaningfulData[index].values = inverterData.values.filter(
-								function(values) {
-									var isMeaningful = (values.dc1Power > 0 || values.dc2Power > 0);
-									var wasLastMeaningful = isLastMeaningful;
-									isLastMeaningful = isMeaningful;
-
-									if (isMeaningful || wasLastMeaningful) {
-										return true;
-									}
-								}
-							)
-						});
-						console.log('meaningfulData', meaningfulData);
-
-						data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
-
+						vm.options.title.text = currentMonth.toLocaleDateString(navigator.language, {month: 'long', year: 'numeric'});
 						vm.series = data.map(function(series) {
-							return series.key;
+							return series.inverterId;
 						});
 
-						vm.data = data.map(function(series) {
-							return series.values;
+						vm.labels = [];
+						vm.data = [];
+						data.forEach(function(inverterData) {
+							inverterData.values.forEach(function(record) {
+								if (labels.indexOf(record.date) < 0) {
+									labels.push(record.date);
+								}
+							});
 						});
 
-						vm.datasetOverride = data.map(function(series) {
-							return seriesOptions;
+						labels.sort();
+
+						data.forEach(function(inverterData) {
+							var seriesData = [];
+							labels.forEach(function(label, index) {
+								// find appropriate value for series and push to vm.data
+								var val = inverterData.values.find(function(record) {
+									if (record.date === label) {
+										return record;
+									}
+								});
+								seriesData.push(val);
+							});
+
+							vm.labels = labels.map(function(label) {
+								var date = new Date(label);
+								return date;
+							});
+
+							vm.data.push(seriesData.map(function(record) {
+								if (!record) {
+									return null;
+								}
+
+								return record.energy;
+							}));
+
 						});
 
 						vm.isLoading = false;
