@@ -17,27 +17,46 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
-
-let daySummaryModel = require('../model/day-summary-model');
-let arrayConverter = require('../day-summary-model-array-converter');
 let moment = require('moment');
 
-module.exports = {
-	get: function(dateString) {
-		let startOfMonthMoment = moment(dateString).startOf('month');
-		let endOfMonthMoment = startOfMonthMoment.clone().endOf('month');
-		let statPromise = daySummaryModel.findAll({
-			where: {
-				date: {
-					$lt: endOfMonthMoment.toDate(),
-					$gt: startOfMonthMoment.toDate()
-				}
-			},
-			order: ['inverter_id', 'date']
-		}).then((res) => {
-			return arrayConverter(res);
-		});
+module.exports = function(dataArray) {
+	var inverters = []; // intermediate object for storing data per inverter
 
-		return statPromise;
+	dataArray.forEach(function(item) {
+		var inverter = getInverterObject(inverters, item);
+		var value = {
+			date: item.date,
+			energy: item.energy,
+			totalEnergy: item.total_energy,
+			duration: item.duration,
+			totalDuration: item.total_duration
+		};
+
+		inverter.values.push(value);
+	});
+
+	return inverters;
+};
+
+function getInverterObject(inverters, record) {
+	var result;
+
+	inverters.some(function(item) {
+		if (item.inverterId == record.inverter_id) {
+			result = item;
+			return true;
+		}
+
+		return false;
+	});
+
+	if (!result) {
+		result = {
+			inverterId: record.inverter_id,
+			values: []
+		};
+		inverters.push(result);
 	}
-}
+
+	return result;
+};
