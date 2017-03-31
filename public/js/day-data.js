@@ -33,7 +33,24 @@
 			};
 
 			socketService.on('new measurement', function() {
-				update();
+				var currentDate = new Date();
+				var vmDate = new Date(vm.date);
+				// set to day start
+				currentDate.setHours(0);
+				vmDate.setHours(0);
+				currentDate.setMinutes(0);
+				vmDate.setMinutes(0);
+				currentDate.setSeconds(0);
+				vmDate.setSeconds(0);
+				currentDate.setMilliseconds(0);
+				vmDate.setMilliseconds(0);
+
+				console.log('vmDate', vmDate, 'currentDate', currentDate, 'equal?', vmDate == currentDate);
+
+				if (vmDate == currentDate) {
+					update();
+				}
+
 			});
 
 			vm.isReady = false;

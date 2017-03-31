@@ -18,13 +18,13 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').component('monthData', {
+	angular.module('app').component('yearData', {
 		templateUrl: 'partials/month-data.html',
 		bindings: {
 			'date': '<',
 			'onSelect': '&'
 		},
-		controller: ['$scope', 'monthDataRepository', function($scope, monthDataRepository) {
+		controller: ['$scope', 'yearDataRepository', function($scope, yearDataRepository) {
 			var vm = this;
 
 			vm.isReady = false;
@@ -34,7 +34,7 @@
 			vm.data = [];
 			vm.labels = [];
 			vm.onClick = function(ev) {
-				// console.log("Clicked", ev, "selecting", ev[0]._model.label);
+				// console.log("Clicked", ev[0]._model.label);
 				vm.onSelect({date: ev[0]._model.label});
 			};
 			vm.options = {
@@ -42,9 +42,9 @@
 					xAxes: [{
 						type: 'time',
 						time: {
-							unit: 'day',
+							unit: 'month',
 							displayFormats: {
-								day: 'DD'
+								month: 'MMM'
 							}
 						},
 						position: 'bottom'
@@ -64,7 +64,7 @@
 			update();
 
 			$scope.$watch('$ctrl.date', function(newValue, oldValue) {
-				if (newValue && (newValue != oldValue)) {
+				if (newValue != oldValue) {
 					update();
 				}
 			});
@@ -74,13 +74,13 @@
 					return;
 				}
 				vm.isLoading = true;
-				monthDataRepository.get(vm.date)
+				yearDataRepository.get(vm.date)
 					.then(function(repositoryData) {
 						var currentMonth = vm.date ? new Date(vm.date) : new Date();
 						var data = repositoryData;
 						var labels = [];
 
-						vm.options.title.text = currentMonth.toLocaleDateString(navigator.language, {month: 'long', year: 'numeric'});
+						vm.options.title.text = currentMonth.toLocaleDateString(navigator.language, {year: 'numeric'});
 						vm.series = data.map(function(series) {
 							return series.inverterId;
 						});
@@ -116,7 +116,7 @@
 
 							vm.data.push(seriesData.map(function(record) {
 								if (!record) {
-									return null;
+									return 0;
 								}
 
 								return record.energy;

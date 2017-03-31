@@ -18,30 +18,27 @@
 
 (function(angular) {
 	'use strict';
-	angular.module('app').component('appDashboardPlot',
-		{
-			templateUrl: 'partials/app-dashboard-plot.html',
-			controller: ['$scope', 'dayMeasurementRepository', 'monthDataRepository', 'yearDataRepository', 'inverterConfigRepository',
-			function($scope, dayMeasurementRepository, monthDataRepository, yearDataRepository, inverterConfigRepository) {
-				var MODES = ['date', 'month', 'year'];
+	angular.module('app').factory('yearDataRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+		return {
+			get: function(date) {
+				if (!date) {
+					date = new Date();
+				}
 
-				var vm = this;
-				vm.date = new Date();
-				vm.mode = MODES[0];
-				vm.onModeChange = function(mode) {
-					vm.mode = mode;
-				};
+				var year = $filter('date')(date, 'yyyy');
 
-				vm.onMonthSelect = function(date) {
-					vm.mode = 'month';
-					vm.date = date;
-				};
-
-				vm.onDaySelect = function(date) {
-					vm.mode = 'date';
-					vm.date = date;
-				};
-
-			}]
-		});
-}(angular));
+				return $http.get(appConfig.backend + 'api/year/' + year)
+					.then(function(data) {
+						if (data.data.success) {
+							return data.data.payload;
+						} else {
+							return $q(function(resolve, reject) {
+								reject(data.data.payload);
+							})
+						}
+					});
+			}
+		}
+	}]
+	);
+}(window.angular));

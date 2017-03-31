@@ -1,9 +1,16 @@
 <h3>Power chart</h3>
+<button class="btn btn-default btn-xs" ng-hide="$ctrl.mode == 'year'" ng-click="$ctrl.onModeChange('year')">Year</button>
+<button class="btn btn-default btn-xs" ng-hide="$ctrl.mode == 'month'" ng-click="$ctrl.onModeChange('month')">Month</button>
+<button class="btn btn-default btn-xs" ng-hide="$ctrl.mode == 'date'" ng-click="$ctrl.onModeChange('date')">Day</button>
+
 <div ng-show="$ctrl.mode == 'date'">
-	<button class="btn btn-default btn-xs" ng-click="$ctrl.onModeChange('month')">Month</button>
-	<day-data></day-data>
+	<day-data date="$ctrl.date"></day-data>
 </div>
+
 <div ng-show="$ctrl.mode == 'month'">
-	<button class="btn btn-default btn-xs" ng-click="$ctrl.onModeChange('date')">Day</button>
-	<month-data></month-data>
+	<month-data date="$ctrl.date" on-select="$ctrl.onDaySelect(date)"></month-data>
+</div>
+
+<div ng-show="$ctrl.mode == 'year'">
+	<year-data date="$ctrl.date" on-select="$ctrl.onMonthSelect(date)"></year-data>
 </div>
