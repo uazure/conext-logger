@@ -32,5 +32,5 @@ module.exports = {
 		'dc2': 1
 	},
 
-	verbosity: 4, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
+	verbosity: 2, // 1 - errors only, 2 - warnings, 3 - logs, 4 - debug
 };

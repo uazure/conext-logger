@@ -32,7 +32,8 @@ module.exports = {
 					$lt: endOfMonthMoment.toDate(),
 					$gt: startOfMonthMoment.toDate()
 				}
-			}
+			},
+			order: ['date', 'inverter_id']
 		}).then((res) => {
 			return arrayConverter(res);
 		});

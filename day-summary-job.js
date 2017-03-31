@@ -23,8 +23,23 @@ let measurementManager = require('./app/manager/measurement-manager');
 let daySummaryModel = require('./app/model/day-summary-model');
 let daySummaryProcessor = require('./app/day-summary-processor');
 
+module.exports = {};
+
+// routine to (re)calculate stats for the whole month
+module.exports.month = function(date) {
+	let startDate = moment(date).date(1);
+	let endDate = moment(date).endOf('month');
+	let currentDate = moment(startDate);
+
+	while (currentDate.isBefore(endDate)) {
+		logger.log('Stat for', currentDate.format('YYYY-MM-DD'));
+		module.exports.run(currentDate.format('YYYY-MM-DD'));
+		currentDate.add(1, 'days');
+	}
+};
+
 // targetDate must be in format YYYY-MM-DD;
-module.exports = function(targetDate) {
+module.exports.run = function(targetDate) {
 	let date;
 
 	if (!targetDate) {
@@ -57,9 +72,9 @@ module.exports = function(targetDate) {
 		logger.warn('Failed to get records from db', res);
 	});
 
-}
+};
 
 if (require.main === module) {
 	// called from console - run with default params
-	module.exports();
+	module.exports.month();
 }
