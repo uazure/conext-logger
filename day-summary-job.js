@@ -33,13 +33,13 @@ module.exports.month = function(date) {
 
 	while (currentDate.isBefore(endDate)) {
 		logger.log('Stat for', currentDate.format('YYYY-MM-DD'));
-		module.exports.run(currentDate.format('YYYY-MM-DD'));
+		module.exports.run(currentDate.format('YYYY-MM-DD'), true);
 		currentDate.add(1, 'days');
 	}
 };
 
 // targetDate must be in format YYYY-MM-DD;
-module.exports.run = function(targetDate) {
+module.exports.run = function(targetDate, forceUpdate) {
 	let date;
 
 	if (!targetDate) {
@@ -48,33 +48,40 @@ module.exports.run = function(targetDate) {
 		date = targetDate;
 	}
 
-	// check if data exists
-	return daySummaryModel.count({where: {
+	let promise = daySummaryModel.findAll({where: {
 		date: date
-	}}).then((res) => {
-		if (res > 0) {
-			logger.log('There are records for date', date, 'will not recalculate');
-		} else {
-			return measurementManager.full(date)
-				.then((data) => {
-					var models = daySummaryProcessor(date, data);
-					models.forEach((model) => {
-						daySummaryModel.create(model).then(() => {
-							logger.log('day summary logged', model);
-						}).catch((err) => {
-							logger.warn('day summary failed to log', err);
-						});
-					});
+	}});
 
+	if (forceUpdate) {
+		promise = promise.then((res) => {
+			let promises = res.map((model) => {return model.destroy()});
+			return Promise.all(promises);
+		});
+	}
+
+	promise.then(function() {
+		return measurementManager.full(date)
+			.then((data) => {
+				var models = daySummaryProcessor(date, data);
+				models.forEach((model) => {
+					daySummaryModel.create(model).then(() => {
+						logger.log('day summary logged', model);
+					}).catch((err) => {
+						logger.warn('day summary failed to log', err);
+					});
 				});
-		}
-	}).catch((res) => {
+			});
+	})
+	.catch((res) => {
 		logger.warn('Failed to get records from db', res);
 	});
+
+	// check if data exists
+	return promise;
 
 };
 
 if (require.main === module) {
 	// called from console - run with default params
-	module.exports.month();
+	module.exports.run('2017-03-31', true);
 }

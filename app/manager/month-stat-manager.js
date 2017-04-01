@@ -29,8 +29,8 @@ module.exports = {
 		let statPromise = daySummaryModel.findAll({
 			where: {
 				date: {
-					$lt: endOfMonthMoment.toDate(),
-					$gt: startOfMonthMoment.toDate()
+					$gt: startOfMonthMoment.toDate(),
+					$lte: endOfMonthMoment.toDate()
 				}
 			},
 			order: ['inverter_id', 'date']
