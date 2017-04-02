@@ -25,7 +25,7 @@ module.exports = function(dataArray) {
 	dataArray.forEach(function(item) {
 		var inverter = getInverterObject(inverters, item);
 		var value = {
-			date: item.date,
+			date: new Date(item.get('month')),
 			energy: item.energy,
 			totalEnergy: item.total_energy,
 			duration: item.duration,

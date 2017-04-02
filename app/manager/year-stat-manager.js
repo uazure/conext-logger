@@ -32,8 +32,8 @@ module.exports = {
 		let statPromise = daySummaryModel.findAll({
 			attributes: [
 				// [daySummaryModel.sequelize.fn('extract', daySummaryModel.sequelize.col('date'), 'month'), 'month'],
-				[daySummaryModel.sequelize.fn('min', daySummaryModel.sequelize.col('date')), 'date'],
-				[daySummaryModel.sequelize.fn('to_char', daySummaryModel.sequelize.col('date'), 'MM'), 'month'],
+				// [daySummaryModel.sequelize.fn('min', daySummaryModel.sequelize.col('date')), 'date'],
+				[daySummaryModel.sequelize.fn('to_char', daySummaryModel.sequelize.col('date'), 'YYYY-MM'), 'month'],
 				'inverter_id',
 				[daySummaryModel.sequelize.fn('max', daySummaryModel.sequelize.col('total_duration')), 'total_duration'],
 				[daySummaryModel.sequelize.fn('max', daySummaryModel.sequelize.col('total_energy')), 'total_energy'],
@@ -43,7 +43,7 @@ module.exports = {
 			group: ['inverter_id', 'month'],
 			where: {
 				date: {
-					$lt: endOfYearMoment.toDate(),
+					$lte: endOfYearMoment.toDate(),
 					$gt: startOfYearMoment.toDate()
 				}
 			},

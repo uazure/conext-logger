@@ -30,6 +30,9 @@
 				vm.mode = MODES[0];
 				vm.onModeChange = function(mode) {
 					vm.mode = mode;
+					if (mode === MODES[0]) {
+						vm.date = new Date();
+					}
 				};
 
 				vm.onMonthSelect = function(date) {
