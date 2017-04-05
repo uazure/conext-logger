@@ -47,7 +47,7 @@
 
 				console.log('vmDate', vmDate, 'currentDate', currentDate, 'equal?', vmDate == currentDate);
 
-				if (vmDate == currentDate) {
+				if (vmDate.valueOf() === currentDate.valueOf()) {
 					update();
 				}
 
