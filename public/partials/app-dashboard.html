@@ -4,13 +4,13 @@
 			Power
 		</div>
 		<div class="col-xs-2">
-			<strong>{{ currentMeasurementSummary.power }} kW</strong>
+			<strong>{{ currentMeasurementSummary.power | number: 3}} kW</strong>
 		</div>
 		<div class="col-xs-2">
 			Today
 		</div>
 		<div class="col-xs-2">
-			<strong>{{ currentMeasurementSummary.energy }} kWh</strong>
+			<strong>{{ currentMeasurementSummary.energy | number: 1}} kWh</strong>
 		</div>
 		<div class="col-xs-2">
 			Month

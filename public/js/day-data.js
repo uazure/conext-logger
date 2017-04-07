@@ -29,8 +29,11 @@
 				pointRadius: 0,
 				pointHitRadius: 5,
 				pointHoverRadius: 4,
-				lineTension: 0
+				lineTension: 0,
+				borderWidth: 0.5,
+				borderColor: '#000'
 			};
+			var colors = ['#FFD700', '#FF8C00', '#4169E1', '#000080'];
 
 			socketService.on('new measurement', function() {
 				var currentDate = new Date();
@@ -105,7 +108,17 @@
 								function(values) {
 									var isMeaningful = (values.dc1Power > 0 || values.dc2Power > 0);
 									var wasLastMeaningful = isLastMeaningful;
+									var isOtherIvertersMeaningful = data.some(function(invData) {
+										if (invData && invData.values && invData.values.some(function(measurement) {
+											if (measurement.createdAt == values.createdAt && (measurement.dc1Power || measurement.dc2Power)) {
+												return true;
+											}
+										})) {
+											return true;
+										}
+									})
 									isLastMeaningful = isMeaningful;
+
 
 									if (isMeaningful || wasLastMeaningful) {
 										return true;
@@ -125,8 +138,15 @@
 							return series.values;
 						});
 
-						vm.datasetOverride = data.map(function(series) {
-							return seriesOptions;
+						vm.datasetOverride = data.map(function(series, index) {
+							var seriesData;
+							if (colors[index]) {
+								seriesData = Object.assign({}, seriesOptions, {backgroundColor: colors[index]});
+							} else {
+								seriesData = seriesOptions;
+							}
+
+							return seriesData;
 						});
 
 						vm.isLoading = false;

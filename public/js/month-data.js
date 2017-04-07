@@ -26,6 +26,11 @@
 		},
 		controller: ['$scope', 'monthDataRepository', function($scope, monthDataRepository) {
 			var vm = this;
+			var seriesOptions = {
+				borderWidth: 0.5,
+				borderColor: '#000'
+			};
+			var colors = ['#FFD700', /*'#FF8C00',*/ '#4169E1', '#000080'];
 
 			vm.isReady = false;
 			vm.isLoading = false;
@@ -109,6 +114,17 @@
 								seriesData.push(val);
 							});
 
+							vm.datasetOverride = seriesData.map(function(series, index) {
+								var seriesData;
+								if (colors[index]) {
+									seriesData = Object.assign({}, seriesOptions, {backgroundColor: colors[index]});
+								} else {
+									seriesData = seriesOptions;
+								}
+
+								return seriesData;
+							});
+
 							vm.labels = labels.map(function(label) {
 								var date = new Date(label);
 								return date;
@@ -121,8 +137,9 @@
 
 								return record.energy;
 							}));
-
 						});
+
+
 
 						vm.isLoading = false;
 						vm.isReady = true;

@@ -79,6 +79,12 @@
 						var currentMonth = vm.date ? new Date(vm.date) : new Date();
 						var data = repositoryData;
 						var labels = [];
+						var seriesOptions = {
+							borderWidth: 0.5,
+							borderColor: '#000'
+						};
+
+						var colors = ['#FFD700', /*'#FF8C00',*/ '#4169E1', '#000080'];
 
 						vm.options.title.text = currentMonth.toLocaleDateString(navigator.language, {year: 'numeric'});
 						vm.series = data.map(function(series) {
@@ -109,6 +115,17 @@
 								seriesData.push(val);
 							});
 
+							vm.datasetOverride = seriesData.map(function(series, index) {
+								var seriesData;
+								if (colors[index]) {
+									seriesData = Object.assign({}, seriesOptions, {backgroundColor: colors[index]});
+								} else {
+									seriesData = seriesOptions;
+								}
+
+								return seriesData;
+							});
+
 							vm.labels = labels.map(function(label) {
 								var date = new Date(label);
 								return date;
@@ -123,6 +140,8 @@
 							}));
 
 						});
+
+
 
 						vm.isLoading = false;
 						vm.isReady = true;
