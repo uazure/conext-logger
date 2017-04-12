@@ -29,6 +29,7 @@ let sequelize = new Sequelize(config.db.connectionString, {
 let Measurement = sequelize.define('measurement', {
 	id: {type: Sequelize.UUID, primaryKey: true},
 	inverter_id: {type: Sequelize.INTEGER, notNull: true},
+	created_at: {type: Sequelize.DATE},
 	dc1_voltage: {
 		type: Sequelize.DECIMAL(5,2),
 		get: function() {
@@ -121,7 +122,7 @@ let Measurement = sequelize.define('measurement', {
 		}
 	},
 }, {
-	createdAt: 'created_at',
+	createdAt: false,
 	updatedAt: false,
 	indexes: [
 		{
