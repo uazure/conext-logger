@@ -25,67 +25,69 @@
 		},
 		controller: ['$scope', 'dayMeasurementRepository', 'dayMeasurementAdapter', 'socketService', function($scope, dayMeasurementRepository, dayMeasurementAdapter, socketService) {
 			var vm = this;
+			var seriesOptions = {
+				pointRadius: 0,
+				pointHitRadius: 5,
+				pointHoverRadius: 4,
+				lineTension: 0,
+				borderWidth: 0.5,
+				borderColor: '#000'
+			};
+			var colors = ['#FFD700', '#FF8C00', '#4169E1', '#000080'];
+
 			socketService.on('new measurement', function() {
-				update();
+				var currentDate = new Date();
+				var vmDate = new Date(vm.date);
+				// set to day start
+				currentDate.setHours(0);
+				vmDate.setHours(0);
+				currentDate.setMinutes(0);
+				vmDate.setMinutes(0);
+				currentDate.setSeconds(0);
+				vmDate.setSeconds(0);
+				currentDate.setMilliseconds(0);
+				vmDate.setMilliseconds(0);
+
+				console.log('vmDate', vmDate, 'currentDate', currentDate, 'equal?', vmDate == currentDate);
+
+				if (vmDate.valueOf() === currentDate.valueOf()) {
+					update();
+				}
+
 			});
 
-			vm.config = {refreshDataOnly: false};
 			vm.isReady = false;
 			vm.isLoading = false;
 
+			vm.series = [];
+			vm.data = [];
 			vm.options = {
-				chart: {
-					type: 'stackedAreaChart',
-					title: 'Today power production',
-					controlLabels: {
-						"stacked":"All",
-						"expanded":"Relative yield",
-					},
-					controlOptions: ["Stacked","Expanded"],
-					height: 600,
-					margin: {
-						top: 0,
-						right: 75,
-						bottom: 40,
-						left: 10
-					},
-					x: function(d) {
-						return d[0];
-					},
-					y: function(d) {
-						return d[1];
-					},
-					useVoronoi: true,
-					clipEdge: true,
-					duration: 100,
-					useInteractiveGuideline: true,
-					xAxis: {
-						showMaxMin: false,
-						tickFormat: function(d) {
-							return d3.time.format('%X')(new Date(d))
+				scales: {
+					xAxes: [{
+						type: 'time',
+						time: {
+							unit: 'hour',
+							displayFormats: {
+								hour: 'HH'
+							}
 						},
-						axisLabel: 'Time'
-					},
-					yAxis: {
-						tickFormat: function(d) {
-							return d3.format(',.1f')(d);
-						},
-						axisLabel: 'Power, kW'
-					},
-					rightAlignYAxis: true,
-					zoom: {
-						enabled: true,
-						scaleExtent: [1, 10],
-						useFixedDomain: false,
-						useNiceScale: false,
-						horizontalOff: false,
-						verticalOff: true,
-						unzoomEventType: 'dblclick.zoom'
-					}
+						position: 'bottom'
+					}],
+					yAxes: [{
+						stacked: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'DC power (stacked), kW'
+						}
+					}]
+				},
+				legend: {
+					display: true
+				},
+				title: {
+					display: true
 				}
 			};
-
-			vm.data = [];
 
 			update();
 
@@ -103,26 +105,53 @@
 						var data = repositoryData;
 						var meaningfulData = angular.copy(data);
 
+						vm.options.title.text = (vm.date || new Date()).toDateString();
+
 						data.forEach(function(inverterData, index) {
 							var isLastMeaningful = false;
 							meaningfulData[index].values = inverterData.values.filter(
 								function(values) {
 									var isMeaningful = (values.dc1Power > 0 || values.dc2Power > 0);
 									var wasLastMeaningful = isLastMeaningful;
+									var isOtherIvertersMeaningful = data.some(function(invData) {
+										if (invData && invData.values && invData.values.some(function(measurement) {
+											if (measurement.createdAt == values.createdAt && (measurement.dc1Power || measurement.dc2Power)) {
+												return true;
+											}
+										})) {
+											return true;
+										}
+									})
 									isLastMeaningful = isMeaningful;
-
-									if (isMeaningful || wasLastMeaningful) {
+									// console.log('isMeaningful', isMeaningful, 'isOtherIvertersMeaningful', isOtherIvertersMeaningful);
+									if (isMeaningful || isOtherIvertersMeaningful || wasLastMeaningful) {
 										return true;
 									}
 								}
 							)
 						});
-						vm.data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
-						var maxValues = vm.data.map(function(series) {
-							return d3.max(series.values, function(value) {return value[1];});
-						})
-						var max = d3.sum(maxValues, function(x) {return x;});
-						vm.options.chart.yDomain = [0, Math.max(1, max)];
+						console.log('meaningfulData', meaningfulData);
+
+						data = dayMeasurementAdapter.convertKeys(meaningfulData, ['dc1Power', 'dc2Power']);
+
+						vm.series = data.map(function(series) {
+							return series.key;
+						});
+
+						vm.data = data.map(function(series) {
+							return series.values;
+						});
+
+						vm.datasetOverride = data.map(function(series, index) {
+							var seriesData;
+							if (colors[index]) {
+								seriesData = Object.assign({}, seriesOptions, {backgroundColor: colors[index]});
+							} else {
+								seriesData = seriesOptions;
+							}
+
+							return seriesData;
+						});
 
 						vm.isLoading = false;
 						vm.isReady = true;

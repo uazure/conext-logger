@@ -29,8 +29,8 @@ var measurement = require('./app/model/measurement-model');
 let measurementManager = require('./app/manager/measurement-manager');
 let daySummaryManager = require('./app/manager/day-summary-manager');
 let inverterConfigManager = require('./app/manager/inverter-configuration-manager');
-let sunPositionManager = require('./app/manager/sunPositionManager');
 let monthStatManager = require('./app/manager/month-stat-manager');
+let yearStatManager = require('./app/manager/year-stat-manager');
 let jsonResponse = require('./app/json-response-factory');
 let pubsub = require('./app/pubsub');
 
@@ -45,7 +45,7 @@ pubsub.on('measurementRecorded', () => {
 	io.emit('new measurement');
 });
 
-
+/** Endpoint that returns current measurement */
 app.get('/api/state', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
@@ -53,10 +53,8 @@ app.get('/api/state', function(req, res) {
 	let deviceDataPromise = deviceManager.readAll();
 	deviceDataPromise
 		.then((data) => {
-			let sunPosition = sunPositionManager.get();
 			res.json(jsonResponse.success(
 				{
-					sunPosition: sunPosition,
 					data: data
 				}
 			));
@@ -66,6 +64,26 @@ app.get('/api/state', function(req, res) {
 		});
 });
 
+
+/** Endpoint that returns recorded measurements for specified date (or current date) */
+app.get('/api/day/:date?', function(req, res) {
+	res.set({
+		'Cache-control': 'no-cache, no-store, must-revalidate'
+	});
+
+	let measurementsPromise = measurementManager.full(req.params.date)
+
+	measurementsPromise
+		.then((data) => {
+			res.json(jsonResponse.success(data));
+		})
+		.catch(() => {
+			res.status(503).json(jsonResponse.error('Failed to get data'));
+		});
+});
+
+
+/** Endpoint that returns day summary data either from db if present, or calculates it on the fly */
 app.get('/api/day/summary/:date?', function(req, res) {
 	res.set({
 		'Cache-control': 'no-cache, no-store, must-revalidate'
@@ -80,6 +98,7 @@ app.get('/api/day/summary/:date?', function(req, res) {
 		});
 });
 
+/** Endpoint that returns summarized info for month (per day) */
 app.get('/api/month/:date?', function(req, res) {
 	let monthStatPromise = monthStatManager.get(req.params.date);
 	monthStatPromise.then((data) => {
@@ -87,22 +106,23 @@ app.get('/api/month/:date?', function(req, res) {
 	});
 });
 
-app.get('/api/day/:date?', function(req, res) {
-	res.set({
-		'Cache-control': 'no-cache, no-store, must-revalidate'
+/** Returns summarized info for year (per month) */
+app.get('/api/year/:year?', function(req, res) {
+	let date = new Date();
+	let yearStatPromise;
+
+	if (req.params.year) {
+		date.setFullYear(req.params.year);
+	}
+
+	yearStatPromise = yearStatManager.get(date);
+	yearStatPromise.then((data) => {
+		res.json(jsonResponse.success(data));
 	});
-
-	let measurementsPromise = measurementManager.brief(req.params.date)
-
-	measurementsPromise
-		.then((data) => {
-			res.json(jsonResponse.success(data));
-		})
-		.catch(() => {
-			res.status(503).json(jsonResponse.error('Failed to get data'));
-		});
 });
 
+
+/** Returns inverter configuration that was active at certain date (current by default) */
 app.get('/api/inverter-config/:date?', function(req, res) {
 	res.set({
 		'Cache-control': 'cache'
@@ -115,6 +135,18 @@ app.get('/api/inverter-config/:date?', function(req, res) {
 		.catch(() => {
 			res.status(503).json(jsonResponse.error('Failed to get data'));
 		});
+});
+
+/** Returns current app runtime config. It includes coordinates for solar station */
+app.get('/api/runtime-config', function(req, res) {
+	res.set({
+		'Cache-control': 'cache'
+	});
+
+	let coordinates = inverterConfigManager.getCoordinates();
+	res.json(jsonResponse.success({
+		coordinates: coordinates
+	}));
 });
 
 // serve static files from 'public' dir

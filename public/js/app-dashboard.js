@@ -21,16 +21,28 @@
 	angular.module('app').component('appDashboard',
 		{
 			templateUrl: 'partials/app-dashboard.html',
-			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository',
-			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository) {
+			controller: ['$scope', '$timeout', 'currentMeasurementRepository', 'dayMeasurementRepository', 'monthDataRepository', 'inverterConfigRepository', 'sunPositionService',
+			function($scope, $timeout, currentMeasurementRepository, dayMeasurementRepository, monthDataRepository, inverterConfigRepository, sunPositionService) {
 				var vm = $scope;
 				var timer;
+				var currentMeasurementSummary = {
+					power: 0,
+					energy: 0,
+					monthEnergy: 0,
+					totalEnergy: 0
+				};
 
 				vm.date = new Date();
 				vm.isReadFailed = false;
-				vm.currentMeasurement = {};
+				vm.currentMeasurement = [];
+				vm.currentMeasurementSummary = currentMeasurementSummary;
 				vm.monthData = [];
 				vm.inverterConfig = {};
+				vm.showDetails = false;
+
+				vm.showDetailsToggle = function() {
+					vm.showDetails = !vm.showDetails;
+				};
 
 				vm.updateMonthSummary = function() {
 					monthDataRepository.get()
@@ -65,18 +77,36 @@
 				vm.update = function() {
 					return currentMeasurementRepository.get()
 						.then(function(result) {
-							vm.sunPosition = result.sunPosition;
+							vm.sunPosition = sunPositionService.get();
 							vm.currentMeasurement = result.data;
+							vm.currentMeasurementSummary = Object.assign({}, currentMeasurementSummary);
+
 							vm.date = new Date(vm.currentMeasurement[0].createdAt);
+
+							/* update summary */
+							vm.currentMeasurement.forEach(function (inverter) {
+								vm.currentMeasurementSummary.power += inverter.ac.power;
+								vm.currentMeasurementSummary.energy += inverter.ac.energy;
+								vm.currentMeasurementSummary.totalEnergy += inverter.ac.totalEnergy;
+								if (vm.monthStat && vm.monthStat[inverter.inverterId]) {
+									/* update summary with month stat */
+									vm.currentMeasurementSummary.monthEnergy += inverter.ac.totalEnergy - vm.monthStat[inverter.inverterId].startEnergy;
+								}
+
+							});
 
 							/* calculate power factor based on azimuth/altitude for each dc
 							if inverterConfig is present */
 							if (vm.inverterConfig) {
 								vm.currentMeasurement.forEach(function(inverter) {
 									inverter.dc.forEach(function(dc, index) {
+										if (!vm.inverterConfig[inverter.inverterId]) {
+											return;
+										}
+
 										var dcConfig = vm.inverterConfig[inverter.inverterId].dc[index];
-										dc.powerFactor = Math.cos((vm.sunPosition.azimuth - dcConfig.azimuth) / 180 * Math.PI)
-											* Math.cos((90 - dcConfig.tilt - vm.sunPosition.altitude) / 180 * Math.PI);
+										var powerFactor = sunPositionService.getPowerFactor(dcConfig, vm.sunPosition);
+										Object.assign(dc, powerFactor);
 									});
 								})
 							}

@@ -26,11 +26,12 @@ var moment = require('moment');
 var pubsub = require('./app/pubsub');
 var shouldReportError = true;
 
-var ConextModelConverter = function(conextModel) {
+var ConextModelConverter = function(conextModel, createdAt) {
 	let model = {};
 
 	model.id = uuid.v4();
 	model.inverter_id = conextModel.inverterId;
+	model.created_at = createdAt;
 	model.dc1_voltage = conextModel.dc[0].voltage;
 	model.dc1_current = conextModel.dc[0].current;
 	model.dc1_power = conextModel.dc[0].power;
@@ -97,12 +98,14 @@ module.exports = function() {
 
 	deviceManager.readAll()
 		.then((data) => {
+			let createdAt;
 			logger.log('got data', data);
 			shouldReportError = true;
 
 			if (isUpdateNeeded(date, data)) {
+				createdAt = data[0].createdAt;
 				data.forEach((res) => {
-					measurement.create(ConextModelConverter(res))
+					measurement.create(ConextModelConverter(res, createdAt))
 						.then(() => {
 							logger.log('logged ok');
 							pubsub.emit('measurementRecorded');

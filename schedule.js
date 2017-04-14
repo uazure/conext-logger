@@ -24,5 +24,5 @@ module.exports = function() {
 	//save values to db every minute
 	crontab.scheduleJob('* * * * *', logJob);
 	// run daySummaryJob on 23:59 each day
-	crontab.scheduleJob('59 23 * * *', daySummaryJob);
+	crontab.scheduleJob('59 23 * * *', daySummaryJob.run);
 };

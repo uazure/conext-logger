@@ -19,6 +19,7 @@
 'use strict';
 
 let inverterConfigModel = require('../model/inverter-config-model');
+let config = require('../../config');
 let moment = require('moment');
 let logger = require('../logger');
 
@@ -103,5 +104,9 @@ module.exports = {
 		});
 
 		return promise;
+	},
+
+	getCoordinates: function() {
+		return config.coordinates;
 	}
 }

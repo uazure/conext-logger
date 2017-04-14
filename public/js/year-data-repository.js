@@ -16,28 +16,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
-let daySummaryModel = require('../model/day-summary-model');
-let arrayConverter = require('../day-summary-model-array-converter');
-let moment = require('moment');
-
-module.exports = {
-	get: function(dateString) {
-		let startOfMonthMoment = moment(dateString).startOf('month');
-		let endOfMonthMoment = startOfMonthMoment.clone().endOf('month');
-		let statPromise = daySummaryModel.findAll({
-			where: {
-				date: {
-					$gt: startOfMonthMoment.toDate(),
-					$lte: endOfMonthMoment.toDate()
+(function(angular) {
+	'use strict';
+	angular.module('app').factory('yearDataRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
+		return {
+			get: function(date) {
+				if (!date) {
+					date = new Date();
 				}
-			},
-			order: ['inverter_id', 'date']
-		}).then((res) => {
-			return arrayConverter(res);
-		});
 
-		return statPromise;
-	}
-}
+				var year = $filter('date')(date, 'yyyy');
+
+				return $http.get(appConfig.backend + 'api/year/' + year)
+					.then(function(data) {
+						if (data.data.success) {
+							return data.data.payload;
+						} else {
+							return $q(function(resolve, reject) {
+								reject(data.data.payload);
+							})
+						}
+					});
+			}
+		}
+	}]
+	);
+}(window.angular));

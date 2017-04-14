@@ -18,7 +18,7 @@
 
 (function(angular){
 	'use strict';
-	angular.module('app', ['ui.router', 'nvd3', 'app.config', 'ui.bootstrap']);
+	angular.module('app', ['ui.router', 'app.config', 'ui.bootstrap', 'chart.js']);
 
 	angular.module('app').config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 

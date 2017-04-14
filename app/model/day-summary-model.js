@@ -60,7 +60,12 @@ let DaySummary = sequelize.define('daySummary', {
 			return Number(this.getDataValue('dc2_energy'));
 		}
 	},
-	duration: {type: Sequelize.INTEGER},
+	duration: {
+		type: Sequelize.INTEGER,
+		get: function() {
+			return Number(this.getDataValue('duration'));
+		}
+	},
 	energy: {
 		type: Sequelize.DECIMAL(6,3),
 		get: function() {
