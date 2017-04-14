@@ -15,12 +15,12 @@ MVP2:
 + job to process data to sum up daily stats by schedule
 
 + api to provide daily summary data
-- api to provide monthly summary data
++ api to provide monthly summary data
 + api to provide inverter/dc inputs information
 
 + view with historical data (1 day)
 - view with 2 days comparison (datepicker involved)
-- view with monthly stats
++ view with monthly stats
 - view with inverter details
 
 + fix concurrency problem with ConextReader

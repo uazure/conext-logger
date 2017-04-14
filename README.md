@@ -37,13 +37,11 @@ It should work on windows as well.
 - angular
 - socket.io
 - bootstrap
-- nvd3
+- Chart.js
 
 ### Known issues / TODO ###
 - Some build system should be implemented to build all deps and minimize js
 - Code need better comments
-- nvd3 has some issues related to DOM updates. Should try to replace it
-with chartjs http://www.chartjs.org/
 - Integrate with some cloud storage to periodically dump database
 
 ## License ##
