@@ -19,6 +19,7 @@
 (function(angular) {
 	'use strict';
 	angular.module('app').factory('dayMeasurementAdapter', [function() {
+		var dcPrefix = 'dc';
 		return {
 			convertKeys: function(inverters, keys) {
 				var rows = []; // rows object for nvd3 plot
@@ -32,8 +33,10 @@
 					});
 
 					if (!resultRow) {
+
 						resultRow = {
 							inverterId: inverterId,
+							dcIndex: Number(field.substr(field.indexOf(dcPrefix) + dcPrefix.length, 1)),
 							field: field,
 							key: 'Inverter ' + inverterId + ', ' + field,
 							values: []
@@ -61,6 +64,21 @@
 				})
 
 				return rows;
+			},
+
+			calculateRelativePower: function(plotData, inverterConfigData) {
+				console.log('plotData', plotData, 'inv config', inverterConfigData);
+				return plotData.map(function(series) {
+					var inverter = inverterConfigData[series.inverterId];
+					var dcConfig = inverter.dc[series.dcIndex-1];
+					var maxPower = dcConfig.power * dcConfig.qty; // W
+					var retval = angular.copy(series);
+					retval.values = series.values.map(function(data) {
+						data.y = 100000 * data.y / maxPower; // in % now with conversion of kW to W
+						return data;
+					});
+					return retval;
+				});
 			}
 		}
 	}]

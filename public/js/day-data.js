@@ -74,7 +74,11 @@
 						position: 'bottom'
 					}],
 					yAxes: [{
-						stacked: true
+						stacked: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'DC power (stacked), kW'
+						}
 					}]
 				},
 				legend: {
@@ -99,54 +103,9 @@
 				dayMeasurementRepository.get(vm.date)
 					.then(function(repositoryData) {
 						var data = repositoryData;
-						var dataSet = [];
 						var meaningfulData = angular.copy(data);
 
 						vm.options.title.text = (vm.date || new Date()).toDateString();
-						console.log('data', data);
-
-						// filter data
-						// step 1 - find inverter with larger amount of values
-
-						data.forEach(function(inverterData, index) {
-							if (inverterData.values.length > dataSet.length) {
-								dataSet = inverterData.values;
-							}
-						});
-						// iterate thru longest dataSet and leave just meaningful data
-						// (which is meaningful for at least one inverter)
-						var isLastMeaningful = false;
-						dataSet = dataSet.filter(function(measurement) {
-							var wasLastMeaningful = isLastMeaningful;
-							var hasMeaningfulData = false;
-							data.some(function(inverterData, index) {
-								console.log('scanning inverter', inverterData.inverterId, 'for measurement', measurement.createdAt);
-								hasMeaningfulData = inverterData.values.some(function(val) {
-									if (inverterData.inverterId == 2) {
-										console.log('inv 2');
-									}
-									if (val.createdAt == measurement.createdAt) {
-										console.log(val.power);
-										return val.power > 0;
-										return true;
-									}
-								});
-								if (!hasMeaningfulData) {
-
-									console.log('has meaningful', hasMeaningfulData, measurement);
-								}
-
-
-								return hasMeaningfulData;
-							});
-
-							isLastMeaningful = hasMeaningfulData;
-							return hasMeaningfulData || wasLastMeaningful;
-						});
-
-						console.log('dataSet is now', dataSet);
-
-
 
 						data.forEach(function(inverterData, index) {
 							var isLastMeaningful = false;
@@ -164,7 +123,7 @@
 										}
 									})
 									isLastMeaningful = isMeaningful;
-									console.log('isMeaningful', isMeaningful, 'isOtherIvertersMeaningful', isOtherIvertersMeaningful);
+									// console.log('isMeaningful', isMeaningful, 'isOtherIvertersMeaningful', isOtherIvertersMeaningful);
 									if (isMeaningful || isOtherIvertersMeaningful || wasLastMeaningful) {
 										return true;
 									}
