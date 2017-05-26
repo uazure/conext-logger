@@ -21,11 +21,11 @@
 	angular.module('app').factory('inverterConfigRepository', ['$http', '$filter', 'appConfig', function($http, $filter, appConfig) {
 		return {
 			get: function(date) {
+				var dateString = '';
 				if (!date) {
 					date = new Date();
+					dateString = $filter('date')(date, 'yyyy-MM-dd');
 				}
-
-				var dateString = $filter('date')(date, 'yyyy-MM-dd');
 
 				return $http.get(appConfig.backend + 'api/inverter-config/' + dateString)
 					.then(function(data) {

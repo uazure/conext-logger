@@ -62,6 +62,7 @@ function getData(requestDate) {
 			}
 		},
 		order: [
+			['inverter_id', 'ASC'],
 			['created_at', 'ASC']
 		]
 	});
