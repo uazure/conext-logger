@@ -18,11 +18,12 @@
 
 
 /*
-USAGE
-
-
+USAGE:
+Check inverterId and modbusConfig to match your setup.
+Then run `node testModubs.js`
 
 */
+
 'use strict';
 
 const inverterId = 1; // this must match modbus id of your inverter
