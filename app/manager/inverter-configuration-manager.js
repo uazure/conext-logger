@@ -75,11 +75,11 @@ module.exports = {
 		let promise = inverterConfigModel.findAll({
 			where: {
 				valid_from: {
-					$lt: date
+					$lte: date
 				},
 				valid_to: {
 					$or: {
-						$gt: date,
+						$gte: date,
 						$eq: null
 					}
 				}

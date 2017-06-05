@@ -21,7 +21,7 @@
 let inverterConfigModel = require('./app/model/inverter-config-model');
 
 (function() {
-	let date = new Date('2017-04-05');
+	let date = new Date('2017-05-18 10:00');
 	let inverterId = 1;
 
 	let result = inverterConfigModel.update({valid_to: date}, {
@@ -45,28 +45,28 @@ let inverterConfigModel = require('./app/model/inverter-config-model');
 			valid_from: date,
 			valid_to: null, // has no expire date, active now
 			inverter_id: inverterId,
-			dc2_panel_name: 'Yabang Solar YBP-250-60',
-			dc2_panel_start_date: new Date(2016, 2, 27), // March 27, 2016
-			dc2_panel_qty: 6, // quantity of the panels used in the array
-			dc2_panel_power: 250, // nominal power of single panel, Watts
+			dc1_panel_name: 'Yabang Solar YBP-250-60',
+			dc1_panel_start_date: new Date(2016, 2, 27), // March 27, 2016
+			dc1_panel_qty: 6, // quantity of the panels used in the array
+			dc1_panel_power: 250, // nominal power of single panel, Watts
+			dc1_panel_location: 'Garage roof',
+			dc1_panel_tilt: 26,
+			dc1_panel_azimut: 184,
+			dc1_panel_voltage_max: 37.54, // open circuit voltage
+			dc1_panel_current_max: 8.84, // short circuit current
+			dc1_panel_voltage_nominal: 29.98, // max power voltage (at standart testing conditions, STC)
+			dc1_panel_current_nominal: 8.34, // max power current (at STC)
+			dc2_panel_name: 'Abi Solar CL-P60250',
+			dc2_panel_start_date: new Date(2016, 6, 1), // July 1, 2016
+			dc2_panel_qty: 6,
+			dc2_panel_power: 250,
 			dc2_panel_location: 'Garage roof',
-			dc2_panel_tilt: 36,
+			dc2_panel_tilt: 26,
 			dc2_panel_azimut: 184,
-			dc2_panel_voltage_max: 37.54, // open circuit voltage
-			dc2_panel_current_max: 8.84, // short circuit current
-			dc2_panel_voltage_nominal: 29.98, // max power voltage (at standart testing conditions, STC)
-			dc2_panel_current_nominal: 8.34, // max power current (at STC)
-			// dc1_panel_name: 'Abi Solar CL-P60250',
-			// dc1_panel_start_date: new Date(2016, 6, 1), // July 1, 2016
-			// dc1_panel_qty: 6,
-			// dc1_panel_power: 250,
-			// dc1_panel_location: 'Garage roof',
-			// dc1_panel_tilt: 36,
-			// dc1_panel_azimut: 184,
-			// dc1_panel_voltage_max: 36.3,
-			// dc1_panel_current_max: 8.71,
-			// dc1_panel_voltage_nominal: 30.6,
-			// dc1_panel_current_nominal: 8.17,
+			dc2_panel_voltage_max: 36.3,
+			dc2_panel_current_max: 8.71,
+			dc2_panel_voltage_nominal: 30.6,
+			dc2_panel_current_nominal: 8.17,
 			inverter_name: 'Conext RL 3000',
 			inverter_ac_power: 3,
 			inverter_start_date: new Date(2016, 2, 27) // March 27, 2016
@@ -76,12 +76,12 @@ let inverterConfigModel = require('./app/model/inverter-config-model');
 }());
 
 
+/*
 (function() {
 	let date = new Date('2017-04-05');
 	let inverterId = 2;
-	/**
-	It's just an example config that initializes inverter configuration record
-	*/
+	
+	// It's just an example config that initializes inverter configuration record
 
 	let result = inverterConfigModel.update({valid_to: date}, {
 		where: {
@@ -131,5 +131,7 @@ let inverterConfigModel = require('./app/model/inverter-config-model');
 			inverter_start_date: new Date(2016, 9, 8) // Octrober 8, 2016
 		});
 	});
+	
 
 }());
+*/

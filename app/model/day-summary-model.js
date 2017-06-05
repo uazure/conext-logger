@@ -30,11 +30,13 @@ let DaySummary = sequelize.define('daySummary', {
 	id: {type: Sequelize.UUID, primaryKey: true},
 	date: {
 		type: Sequelize.DATEONLY,
-		notNull: true
+		notNull: true,
+		unique: 'compositeIndex'
 	},
 	inverter_id: {
 		type: Sequelize.INTEGER,
-		notNull: true
+		notNull: true,
+		unique: 'compositeIndex'
 	},
 	dc1_power_max: {
 		type: Sequelize.DECIMAL(5,3),
