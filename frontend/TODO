@@ -1,0 +1,5 @@
+1) Implement endpoint that provides following info for given date:
+
+- this month start yield (last month end yield is ok too)
+- previous day yield
+- previous month yield
