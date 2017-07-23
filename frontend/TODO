@@ -3,3 +3,11 @@
 - this month start yield (last month end yield is ok too)
 - previous day yield
 - previous month yield
+
+2) Add to dashboard monthly yield, prev day yield, prev month yield
+
+3) Cumulative plots for today power
+
+4) per inverter plots for today yield and previous day
+
+5) plots for today ac voltage and freq
