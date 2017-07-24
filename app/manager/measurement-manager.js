@@ -42,6 +42,25 @@ module.exports.full = function(date) {
 			});
 }
 
+module.exports.dateStartTotalYield = function(date) {
+	let momentStart = moment(date).startOf('day');
+	return measurement.findAll({
+		attributes: [
+			['inverter_id', 'inverter_id'],
+			[measurement.sequelize.fn('min', measurement.sequelize.col('total_energy')), 'total_energy'],
+		],
+		where: {
+			created_at: {
+				$gt: momentStart.toDate()
+			}
+		},
+		group: ['inverter_id'],
+		order: [
+			['inverter_id', 'ASC']
+		]
+	});
+}
+
 function getData(requestDate) {
 	let momentEnd;
 	let momentStart;

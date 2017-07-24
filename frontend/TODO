@@ -1,8 +1,9 @@
 1) Implement endpoint that provides following info for given date:
 
-- this month start yield (last month end yield is ok too)
++ this month start yield (last month end yield is ok too)
 - previous day yield
 - previous month yield
++ total yield 30 days ago
 
 2) Add to dashboard monthly yield, prev day yield, prev month yield
 
