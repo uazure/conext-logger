@@ -21,12 +21,16 @@
 	angular.module('app').component('appDashboardPlot',
 		{
 			templateUrl: 'partials/app-dashboard-plot.html',
-			controller: ['$scope', 'dayMeasurementRepository', 'monthDataRepository', 'yearDataRepository', 'inverterConfigRepository',
-			function($scope, dayMeasurementRepository, monthDataRepository, yearDataRepository, inverterConfigRepository) {
+			controller: ['$scope', 'dayMeasurementRepository', 'monthDataRepository', 'yearDataRepository', 'inverterConfigRepository', 'appConfig',
+			function($scope, dayMeasurementRepository, monthDataRepository, yearDataRepository, inverterConfigRepository, appConfig) {
 				var MODES = ['date', 'month', 'year'];
 
 				var vm = this;
 				vm.date = new Date();
+				vm.years = [];
+				for (var i = appConfig.startYear; i <= vm.date.getFullYear(); ++i) {
+					vm.years.push(i);
+				}
 				vm.mode = MODES[0];
 				vm.onModeChange = function(mode) {
 					vm.mode = mode;
@@ -44,6 +48,10 @@
 					vm.mode = 'date';
 					vm.date = date;
 				};
+
+				vm.onYearSelect = function(year) {
+					vm.date = new Date(year, 0);
+				}
 
 			}]
 		});

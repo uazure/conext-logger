@@ -2,7 +2,8 @@
 	'use strict';
 
 	angular.module('app.config', []).constant('appConfig', {
-		backend: '/'
+		backend: '/',
+		startYear: 2017
 	});
 
 	angular.module('app.config').run(['$http', 'appConfig', function($http, appConfig) {
