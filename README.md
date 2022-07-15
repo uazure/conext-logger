@@ -1,7 +1,7 @@
 # Conext logger #
 
 It is a monitor/logger designed for my setup of two Schneider Electric Conext RL
-solar inverters. You can see live version on http://solar.azure.pp.ua:8080/
+solar inverters. You can see live version on http://solar.azure.pp.ua/
 
 It's UNDER DEVELOPMENT. It may require some steps that are not described here
 in order to make it work on your computer.
@@ -17,12 +17,17 @@ It should work on windows as well.
 
 ## Setup ##
     $ npm install
+    
     # check config.js for database settings
     # then run createdb script to create tables
+    
     $ node createdb.js
+    
     $ cp local-config.js.example local-config.js
+    
     # set your telegram bot id and chat id in local-config.js (if you have)
     # check inverterConfigInitialize.js and set correct values for your setup
+    
     $ node inverterConfigInitialize.js
 
 ## Technical notes ##
