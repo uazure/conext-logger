@@ -19,6 +19,7 @@
 'use strict';
 
 let inverterConfigModel = require('./app/model/inverter-config-model');
+const { Op } = require('sequelize');
 
 (function() {
 	let date = new Date('2017-05-18 10:00');
@@ -28,12 +29,12 @@ let inverterConfigModel = require('./app/model/inverter-config-model');
 		where: {
 			inverter_id: inverterId,
 			valid_from: {
-				$lt: date
+				[Op.lt]: date
 			},
 			valid_to: {
-				$or: {
-					$gt: date,
-					$eq: null
+				[Op.or]: {
+					[Op.gt]: date,
+					[Op.eq]: null
 				}
 			}
 		}

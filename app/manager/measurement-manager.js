@@ -26,6 +26,7 @@ and returns promise which is resolved with array of inverters data
 let measurement = require('../model/measurement-model');
 let measurementArrayConverter = require('../measurement-model-array-converter');
 let moment = require('moment');
+const { Op } = require('sequelize');
 
 module.exports = {};
 module.exports.brief = function(date) {
@@ -57,8 +58,8 @@ function getData(requestDate) {
 	return measurement.findAll({
 		where: {
 			created_at: {
-				$lt: momentEnd.toDate(),
-				$gt: momentStart.toDate()
+				[Op.lt]: momentEnd.toDate(),
+				[Op.gt]: momentStart.toDate()
 			}
 		},
 		order: [

@@ -21,6 +21,7 @@
 let daySummaryModel = require('../model/day-summary-model');
 let arrayConverter = require('../month-summary-array-converter');
 let moment = require('moment');
+const { Op } = require('sequelize');
 
 module.exports = {
 	get: function(year) {
@@ -43,8 +44,8 @@ module.exports = {
 			group: ['inverter_id', 'month'],
 			where: {
 				date: {
-					$lte: endOfYearMoment.toDate(),
-					$gt: startOfYearMoment.toDate()
+					[Op.lte]: endOfYearMoment.toDate(),
+					[Op.gt]: startOfYearMoment.toDate()
 				}
 			},
 			order: ['inverter_id', 'month']

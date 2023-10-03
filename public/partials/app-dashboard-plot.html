@@ -13,5 +13,6 @@
 </div>
 
 <div ng-show="$ctrl.mode == 'year'">
+	<button ng-repeat="year in $ctrl.years" class="btn btn-default btn-xs" ng-click="$ctrl.onYearSelect(year)">{{year}}</button>
 	<year-data date="$ctrl.date" on-select="$ctrl.onMonthSelect(date)"></year-data>
 </div>

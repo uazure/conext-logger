@@ -19,6 +19,7 @@
 'use strict';
 
 let inverterConfigModel = require('../model/inverter-config-model');
+const { Op } = require("sequelize");
 let config = require('../../config');
 let moment = require('moment');
 let logger = require('../logger');
@@ -75,12 +76,12 @@ module.exports = {
 		let promise = inverterConfigModel.findAll({
 			where: {
 				valid_from: {
-					$lte: date
+					[Op.lte]: date
 				},
 				valid_to: {
-					$or: {
-						$gte: date,
-						$eq: null
+					[Op.or]: {
+						[Op.gte]: date,
+						[Op.eq]: null
 					}
 				}
 			}
