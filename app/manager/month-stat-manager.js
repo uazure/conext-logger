@@ -21,6 +21,7 @@
 let daySummaryModel = require('../model/day-summary-model');
 let arrayConverter = require('../day-summary-model-array-converter');
 let moment = require('moment');
+const { Op } = require('sequelize');
 
 module.exports = {
 	get: function(dateString) {
@@ -29,8 +30,8 @@ module.exports = {
 		let statPromise = daySummaryModel.findAll({
 			where: {
 				date: {
-					$gt: startOfMonthMoment.toDate(),
-					$lte: endOfMonthMoment.toDate()
+					[Op.gt]: startOfMonthMoment.toDate(),
+					[Op.lte]: endOfMonthMoment.toDate()
 				}
 			},
 			order: ['inverter_id', 'date']
